@@ -5,6 +5,6 @@ The project is divided in two parts : Electronics and Informatic
 Here is the Informatic part wich treat informations, images and take decisions
 
 # Dependancies
-- Tensorflow-gpu
-- Keras-gpu
+- Tensorflow
+- Keras
 - Numpy
