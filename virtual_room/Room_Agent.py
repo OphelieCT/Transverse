@@ -18,3 +18,6 @@ class Room_Agent:
         Room_Agent.general_id += 1
 
         self.map = []
+
+    def __str__(self):
+        return "Agent with id {}".format(self.id)
