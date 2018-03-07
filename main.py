@@ -9,7 +9,5 @@ import virtual_room
 
 # ---- Script ----
 if __name__ == '__main__':
-    lab = virtual_room.Virtual_Room((5, 5))
-    agent = virtual_room.Room_Agent()
-    print(agent.id)
-    lab.represent()
+    room = virtual_room.Virtual_Room((10, 10))
+    agent = virtual_room.Artificial_Agent(_map=room.grid)
