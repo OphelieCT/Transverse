@@ -44,10 +44,16 @@ class Artificial_Agent(virtual_room.Room_Agent):
 
     def choose_action(self):
         plan = np.array(self.map)
-        plan = array_to_img(plan)
+        plan[self.position[0]][self.position[1]] = 0.5
         if K.image_data_format() == 'channels_first':
-            plan = plan.resize(self.shape[1:])
+            dimensions = self.shape[1:]  # prepare dimensions to resize after
+            plan = plan.reshape((1,) + plan.shape)  # prepare to image conversion
         else:
-            plan = plan.resize(self.shape[:-1])
+            dimensions = self.shape[:-1]  # prepare dimensions to resize after
+            plan = plan.reshape(plan.shape + (1,))  # prepare to image conversion
+        plan = array_to_img(plan)
+        plan = plan.resize(dimensions)
+
         plan = img_to_array(plan)
         prediction = self.net.predict(np.array([plan]))[0]
+        return prediction

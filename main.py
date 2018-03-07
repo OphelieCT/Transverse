@@ -11,3 +11,4 @@ import virtual_room
 if __name__ == '__main__':
     room = virtual_room.Virtual_Room((10, 10))
     agent = virtual_room.Artificial_Agent(_map=room.grid)
+    print(agent.choose_action())
