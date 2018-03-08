@@ -9,5 +9,5 @@ import virtual_room
 
 # ---- Script ----
 if __name__ == '__main__':
-    room = virtual_room.Virtual_Room((1000, 1000))
+    room = virtual_room.Virtual_Room((3, 3))
     agent = virtual_room.Artificial_Agent(_map=room.grid)
