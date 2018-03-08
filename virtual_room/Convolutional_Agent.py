@@ -8,6 +8,7 @@
 import virtual_room
 import time
 import numpy as np
+import copy
 import keras.backend as K
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
@@ -43,7 +44,8 @@ class Artificial_Agent(virtual_room.Room_Agent):
         self.net.compile(optimizer='adadelta', loss='binary_crossentropy', metrics=['accuracy'])
 
     def choose_action(self):
-        plan = np.array(self.map)
+        """ Movement {0,1,2,3} -> {haut, droite, bas, gauche} """
+        plan = copy.copy(np.array(self.map))
         plan[self.position[0]][self.position[1]] = 0.5
         if K.image_data_format() == 'channels_first':
             dimensions = self.shape[1:]  # prepare dimensions to resize after
@@ -57,3 +59,14 @@ class Artificial_Agent(virtual_room.Room_Agent):
         plan = img_to_array(plan)
         prediction = self.net.predict(np.array([plan]))[0]
         return prediction
+
+    def move(self, next_x=None, next_y=None):
+        traductor = {
+            (0, 0, 0, 1): [-1, 0],  # haut
+            (0, 0, 1, 0): [0, 1],  # droite
+            (0, 1, 0, 0): [1, 0],  # bas
+            (1, 0, 0, 0): [0, -1],  # gauche
+        }
+        predictions = tuple(np.round(self.choose_action()))
+        next_x, next_y = np.array(self.position) + np.array(traductor.get(predictions))
+        movement = virtual_room.Room_Agent.move(self, next_x, next_y)
