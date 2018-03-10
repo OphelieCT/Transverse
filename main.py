@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 # ---- Script ----
 if __name__ == '__main__':
-    room = virtual_room.Virtual_Room((1000, 1000))
+    room = virtual_room.Virtual_Room((100, 100))
     agent = virtual_room.Artificial_Agent(_map=room.grid)
     print('Score de départ : {}'.format(agent.score))
     turns = 10 ** 4

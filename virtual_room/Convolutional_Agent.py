@@ -10,6 +10,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
+import os
 import keras.backend as K
 from keras.models import Sequential
 from keras.layers import Dropout, Dense
@@ -42,32 +43,37 @@ class Artificial_Agent(virtual_room.Room_Agent):
             self.build_net()
             try:
                 self.net.load_weights(save_file)
-            except OSError:
+            except (OSError, ValueError):
                 self.train_to_move()
 
     def build_net(self):
         self.net = Sequential([
             Dense(20, input_dim=4, activation='relu'),
             Dropout(0.2),
-            Dense(40, activation='relu'),
+            Dense(16, activation='relu'),
             Dropout(0.2),
             Dense(4, activation='softmax')
         ])
         self.net.compile(optimizer='adadelta', loss=losses.binary_crossentropy, metrics=['accuracy'])
 
-    def prepare_batch(self, pos_x=None, pos_y=None):
+    def prepare_batch(self, special_map=None, pos_x=None, pos_y=None):
+        if special_map is None:
+            special_map = self.map
         if pos_x is None:
             pos_x = self.position[0]
         if pos_y is None:
             pos_y = self.position[1]
         temp = []
-        for i in range(-1, 2):
-            for j in range(-1, 2):
+        height = 1
+        width = 1
+        for i in range(-height, height + 1):
+            for j in range(-width, width + 1):
                 if i ** 2 != j ** 2:
-                    try:
-                        temp.append(self.map[pos_x + i][pos_y + j])
-                    except IndexError:
+                    if 0 <= (pos_x + i) < len(special_map) and 0 <= (pos_y + j) < len(special_map[0]):
+                        temp.append(special_map[pos_x + i][pos_y + j])
+                    else:
                         temp.append(1.)
+        temp = np.array(temp)
         return temp
 
     def choose_action(self):
@@ -79,12 +85,11 @@ class Artificial_Agent(virtual_room.Room_Agent):
     def train_to_move(self):
         training_map = np.full(self.map.shape, 0.)
         x_train = np.array([
-            (0, 0, 0, 1),  # milieu haut
-            (0, 0, 1, 0),  # milieu droite
-            (0, 1, 0, 0),  # milieu bas
-            (1, 0, 0, 0)  # milieu gauche
+            self.prepare_batch(training_map, 0, len(training_map[0]) // 2),  # milieu haut
+            self.prepare_batch(training_map, len(training_map) // 2, len(training_map[0]) - 1),  # milieu droite
+            self.prepare_batch(training_map, len(training_map) - 1, len(training_map[0]) // 2),  # milieu bas
+            self.prepare_batch(training_map, len(training_map) // 2, 0)  # milieu gauche
         ])
-        predictions = self.net.predict(x_train)
         x_targets = np.array([
             (0, 1, 0, 0),  # bas
             (1, 0, 0, 0),  # gauche
@@ -92,7 +97,13 @@ class Artificial_Agent(virtual_room.Room_Agent):
             (0, 0, 1, 0),  # droite
         ])
         history = self.net.fit(x=x_train, y=x_targets, epochs=1000, batch_size=1, verbose=0)
-        self.net.save_weights(self.save_file)
+        print(np.round(self.net.predict(x_train)))
+        while True:
+            try:
+                self.net.save_weights(self.save_file)
+                break
+            except OSError:
+                self.save_file = self.save_file[:-3] + '1' + '.h5'
 
     def move(self, next_x=None, next_y=None):
         predictions = tuple(np.round(self.choose_action()))
