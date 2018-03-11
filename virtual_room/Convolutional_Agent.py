@@ -15,7 +15,7 @@ import virtual_room
 
 
 # ---- Class ----
-class Artificial_Agent(virtual_room.Room_Agent):
+class Convolutional_Agent(virtual_room.Room_Agent):
     """ Room Agent with artificial intelligence control """
 
     def __init__(self, shape=(224, 224), own_map=None, network=None, depth=1, save_file='test.h5', base_position=None):
