@@ -4,25 +4,22 @@
 # ---- Description ----
 """ A Room Agent with AI """
 
+import keras.backend as K
+import numpy as np
+from keras import losses
+from keras.layers import Dropout, Dense
+from keras.models import Sequential
+
 # ---- Imports ----
 import virtual_room
-import time
-import matplotlib.pyplot as plt
-import numpy as np
-import copy
-import os
-import keras.backend as K
-from keras.models import Sequential
-from keras.layers import Dropout, Dense
-from keras import losses
 
 
 # ---- Class ----
 class Artificial_Agent(virtual_room.Room_Agent):
     """ Room Agent with artificial intelligence control """
 
-    def __init__(self, shape=(224, 224), _map=None, network=None, depth=1, save_file='test.h5', base_position=None):
-        virtual_room.Room_Agent.__init__(self, _map)
+    def __init__(self, shape=(224, 224), own_map=None, network=None, depth=1, save_file='test.h5', base_position=None):
+        virtual_room.Room_Agent.__init__(self, own_map)
         self.position = base_position
         if base_position is None:
             self.position = (len(self.map) // 2, len(self.map[0]) // 2)

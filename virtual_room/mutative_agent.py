@@ -5,9 +5,8 @@
 """ An agent with neural network wich can mutate """
 
 # ---- Imports ----
-import keras.backend as K
-from keras import models, layers
 import numpy as np
+from keras import models, layers
 
 # ---- Settings ----
 np.random.seed()
