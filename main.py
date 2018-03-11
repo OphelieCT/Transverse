@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 # ---- Script ----
 if __name__ == '__main__':
-    room = virtual_room.Virtual_Room((100, 100))
+    """room = virtual_room.Virtual_Room((100, 100))
     agent = virtual_room.Artificial_Agent(_map=room.grid)
     print('Score de départ : {}'.format(agent.score))
     turns = 10 ** 4
@@ -21,4 +21,4 @@ if __name__ == '__main__':
             print('{}) - Score : {}'.format(i, agent.score))
     print('Score final : {}'.format(agent.score))
     plt.scatter(agent.movement_history.get('x'), agent.movement_history.get('y'))
-    plt.show()
+    plt.show()"""

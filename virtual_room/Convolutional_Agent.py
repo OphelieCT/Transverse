@@ -97,7 +97,6 @@ class Artificial_Agent(virtual_room.Room_Agent):
             (0, 0, 1, 0),  # droite
         ])
         history = self.net.fit(x=x_train, y=x_targets, epochs=1000, batch_size=1, verbose=0)
-        print(np.round(self.net.predict(x_train)))
         while True:
             try:
                 self.net.save_weights(self.save_file)
