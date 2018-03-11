@@ -37,6 +37,12 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
         better_index = predictions.index(better)
         action = actions.get(better_index)
         if better_index < 2:  # rotation
-            result = action[0](action[1][0])
+            action[0](action[1][0])
         else:  # move forward
             result = action[0](action[1][0], action[1][1])
+            if result == 0:
+                case_value = self.map[self.position[0]][self.position[1]]
+                if case_value == self.UNKNOWN:
+                    self.score += 2
+                elif case_value == self.OBSTACLE:
+                    self.score -= 5
