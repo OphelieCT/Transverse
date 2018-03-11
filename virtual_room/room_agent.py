@@ -16,7 +16,7 @@ class Room_Agent:
     UNKNOWN = -2.
     CLEAR = 0.
 
-    def __init__(self, own_map=None, initial_position=None, initial_direction=0):
+    def __init__(self, own_map=None, initial_position=None, initial_direction=90):
         self.id = Room_Agent.general_id
         Room_Agent.general_id += 1
         self.position = initial_position
@@ -36,6 +36,10 @@ class Room_Agent:
             self.position = (next_x, next_y)
             return 0
         return 1
+
+    def rotate(self, to_direction):
+        to_direction %= 360
+        self.direction = to_direction
 
     def scan_map(self, to_scan, pos_x, pos_y, direction):
         """ Direction {0,1,2,3} -> {haut, droite, bas, gauche}
