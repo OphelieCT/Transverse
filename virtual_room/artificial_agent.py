@@ -38,5 +38,5 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
         action = actions.get(better_index)
         if better_index < 2:  # rotation
             result = action[0](action[1][0])
-        else:  # move
+        else:  # move forward
             result = action[0](action[1][0], action[1][1])
