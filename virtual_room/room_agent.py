@@ -81,8 +81,8 @@ class Room_Agent:
             return totals
         elif self.map[pos_x][pos_y] == value_to_count[1]:
             totals[1] += 1
-        next_x = int(np.round(np.cos(direction))) + pos_x
-        next_y = int(np.round(np.sin(direction))) + pos_y
+        next_x = pos_x - int(np.round(np.cos(direction)))
+        next_y = pos_y - int(np.round(np.sin(direction)))
         if 0 <= next_x < len(self.map) and 0 <= next_y < len(self.map[0]):
             return self.count_values(next_x, next_y, direction, value_to_count, totals)
         return totals
