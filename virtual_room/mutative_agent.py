@@ -18,7 +18,7 @@ np.random.seed()
 class Mutative_Agent:
     """ An agent with neural network wich can mutate """
 
-    def __init__(self, mutation_rate=0.3, network=None, weights_file='mutative.h5'):
+    def __init__(self, mutation_rate=30, network=None, weights_file='mutative.h5'):
         self.score = 0
         self.weights_file = weights_file
         self.mutation_rate = mutation_rate
