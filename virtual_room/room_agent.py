@@ -69,8 +69,7 @@ class Room_Agent:
                                              np.deg2rad((self.direction + 360 - bisectrix) % 360),
                                              to_count, totals))).tolist()
         for i in range(2):
-            if datas[i] > 1:
-                datas[i] = 1
+            datas[i] = min(datas[i], 1)
         return datas
 
     def count_values(self, pos_x, pos_y, direction, value_to_count, totals):
