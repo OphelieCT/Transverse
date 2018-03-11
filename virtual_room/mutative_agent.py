@@ -57,10 +57,10 @@ class Mutative_Agent:
     def mutation(self):
         """ Create second neural network and mix both with 1/10 variation """
         temp = [self.net] * 9 + [self.build_net()]
-        self.net = self.cross(temp)
+        self.net = self.cross(temp, fusion=True)
 
     @staticmethod
-    def cross(networks):
+    def cross(networks, fusion=False):
         """ Mix each network in list with the first layer by layer """
         if type(networks) not in (tuple, list, np.ndarray):
             return None
@@ -71,10 +71,12 @@ class Mutative_Agent:
                     temp_weights = temp_net.layers[j].get_weights()
                     input_weights = networks[i].layers[j].get_weights()
                     for _ in range(len(temp_weights)):
-                        if np.random.randint(0, 101) < 50:
-                            temp_weights[_] = input_weights[_]
-                        # temp_weights[_] += input_weights[_]
-                        # temp_weights[_] /= len(networks)
+                        if fusion:
+                            temp_weights[_] += input_weights[_]
+                            temp_weights[_] /= len(networks)
+                        else:
+                            if np.random.randint(0, 101) < 50:
+                                temp_weights[_] = input_weights[_]
                     temp_net.layers[j].set_weights(temp_weights)
         except ValueError:
             return None
