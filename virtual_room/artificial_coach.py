@@ -14,12 +14,13 @@ from virtual_room import Process, Virtual_Room, Mutative_Agent
 class Artificial_Coach:
     """ Class for let evolve multiple instances of artificial agents """
 
-    def __init__(self, population_size=100, generations=100, turns_number=100, own_map=None, initial_position='random',
+    def __init__(self, map_shape=(100, 100), population_size=100, generations=100, turns_number=100, own_map=None,
+                 initial_position='random',
                  initial_direction='random', network=None,
                  weights_file='mutative.h5'):
         self.map = own_map
         if self.map is None:
-            self.map = Virtual_Room((100, 100))
+            self.map = Virtual_Room(map_shape)
         self.generations_number = generations
         self.turns = turns_number
         temp_map = copy.deepcopy(self.map.grid)  # keep original map safe
