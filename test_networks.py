@@ -23,5 +23,4 @@ if __name__ == '__main__':
     for i in range(turns):
         agent.execute_actions()
     print('Final score :', agent.score)
-    print(agent.movement_history)
     agent.resume_movements()
