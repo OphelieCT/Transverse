@@ -7,7 +7,8 @@
 # ---- Imports ----
 import numpy as np
 
-from virtual_room import Room_Agent, Mutative_Agent
+from virtual_room.mutative_agent import Mutative_Agent
+from virtual_room.room_agent import Room_Agent
 
 
 # ---- Class ----

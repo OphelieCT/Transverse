@@ -7,7 +7,7 @@
 # ---- Imports ----
 import threading
 
-from virtual_room import Artificial_Agent
+from virtual_room.artificial_agent import Artificial_Agent
 
 # ---- Settings ----
 lock = threading.RLock()

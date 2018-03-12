@@ -4,10 +4,12 @@
 # ---- Description ----
 """ Class wich trains artificial agents and let them evolve """
 
+# ---- Imports ----
 import copy
 
-# ---- Imports ----
-from virtual_room import Process, Virtual_Room, Mutative_Agent
+from virtual_room.mutative_agent import Mutative_Agent
+from virtual_room.room import Virtual_Room
+from virtual_room.thread_agent import Process
 
 
 # ---- Class ----

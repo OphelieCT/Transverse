@@ -11,7 +11,7 @@ from keras.layers import Dropout, Dense
 from keras.models import Sequential
 
 # ---- Imports ----
-from virtual_room import Room_Agent
+from virtual_room.room_agent import Room_Agent
 
 
 # ---- Class ----
