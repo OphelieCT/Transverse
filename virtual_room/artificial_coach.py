@@ -63,6 +63,9 @@ class Artificial_Coach:
             self.training(turns=turns_per_generation)
             self.population = sorted(self.population)
             self.population[0].save_me()
+            if verbose > 0:
+                print('Highest score : ', self.population[0].score)
+                print('Lowest score : ', self.population[-1].score, '\n')
         if verbose > 1:
             self.population[0].resume_movements()
         return self.population[0]

@@ -28,7 +28,7 @@ class Mutative_Agent:
         self.net.predict(np.array([[0, 0, 0]]))
 
     def __lt__(self, other):
-        return self.score < other.score
+        return self.score > other.score
 
     def save_me(self):
         try:
@@ -62,8 +62,11 @@ class Mutative_Agent:
             self.mutation()
 
     def mutation(self):
-        """ Create second neural network and mix both with 1/10 variation """
-        temp = [self.net] * 9 + [self.build_net()]
+        """ Create second neural network and mix both with 1/50 variation """
+        temp = []
+        for i in range(49):
+            temp.append(copy.copy(self.net))
+        temp.append(self.build_net())
         self.net = self.cross(temp, fusion=True)
 
     @staticmethod

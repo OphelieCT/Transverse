@@ -12,7 +12,7 @@ generations = 100
 turns = 100
 population = 10
 weights = 'training.h5'
-map_shape = (100, 100)
+map_shape = (1000, 1000)
 
 # ---- Script ----
 if __name__ == '__main__':
