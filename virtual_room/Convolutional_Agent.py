@@ -11,15 +11,15 @@ from keras.layers import Dropout, Dense
 from keras.models import Sequential
 
 # ---- Imports ----
-import virtual_room
+from virtual_room import Room_Agent
 
 
 # ---- Class ----
-class Convolutional_Agent(virtual_room.Room_Agent):
+class Convolutional_Agent(Room_Agent):
     """ Room Agent with artificial intelligence control """
 
     def __init__(self, shape=(224, 224), own_map=None, network=None, depth=1, save_file='test.h5', base_position=None):
-        virtual_room.Room_Agent.__init__(self, own_map)
+        Room_Agent.__init__(self, own_map)
         self.position = base_position
         if base_position is None:
             self.position = (len(self.map) // 2, len(self.map[0]) // 2)
@@ -104,7 +104,7 @@ class Convolutional_Agent(virtual_room.Room_Agent):
     def move(self, next_x=None, next_y=None):
         predictions = tuple(np.round(self.choose_action()))
         next_x, next_y = np.array(self.position) + np.array(self.traductor.get(predictions))
-        if virtual_room.Room_Agent.move(self, next_x, next_y) == 0:
+        if Room_Agent.move(self, next_x, next_y) == 0:
             self.movement_history['x'].append(next_x)
             self.movement_history['y'].append(next_y)
 

@@ -38,7 +38,8 @@ class Artificial_Coach:
         if turns is None:
             turns = self.turns
         for process in self.population:
-            process.start(turns)
+            process.turns = turns
+            process.start()
         for process in self.population:
             process.join()
         self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3, other_percentage=0.1)

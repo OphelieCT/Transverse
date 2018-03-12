@@ -17,7 +17,7 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
     def __init__(self, own_map=None, initial_position=None, initial_direction=90, network=None,
                  weights_file='mutative.h5'):
         Room_Agent.__init__(self, own_map, initial_position, initial_direction)
-        Mutative_Agent.__init__(network, weights_file)
+        Mutative_Agent.__init__(self, network, weights_file)
         self.known = []
 
     def choose_direction(self):
