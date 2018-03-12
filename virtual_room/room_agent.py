@@ -39,6 +39,9 @@ class Room_Agent:
     def __str__(self):
         return "Agent with id {}".format(self.id)
 
+    def reset_movements(self):
+        self.movement_history = {'x': [], 'y': []}
+    
     def resume_movements(self):
         plt.scatter(self.movement_history['x'], self.movement_history['y'])
         return plt
