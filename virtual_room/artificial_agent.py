@@ -16,16 +16,17 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
     """ Artificial agent with mutative neural network"""
 
     def __init__(self, own_map=None, initial_position=None, initial_direction=90, network=None,
-                 weights_file='mutative.h5'):
-        Room_Agent.__init__(self, own_map, initial_position, initial_direction)
-        Mutative_Agent.__init__(self, mutation_rate=30, network=network, weights_file=weights_file)
+                 weights_file='mutative.h5', mutation_rate=30):
+        Room_Agent.__init__(self, own_map=own_map, initial_position=initial_position,
+                            initial_direction=initial_direction)
+        Mutative_Agent.__init__(self, mutation_rate=mutation_rate, network=network, weights_file=weights_file)
         self.known = []
 
     def choose_direction(self):
         # self.scan_map(self.map, self.position[0], self.position[1], self.direction)
         datas = self.data_on_front()
         predictions = self.net.predict(np.array([datas]))
-        return predictions[0]
+        return predictions[0].tolist()
 
     def execute_actions(self):
         actions = {
@@ -39,7 +40,7 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
         better_index = predictions.index(better)
         action = actions.get(better_index)
         if better_index < 2:  # rotation
-            action[0](action[1][0])
+            action[0](action[1])
         else:  # move forward
             result = action[0](action[1][0], action[1][1])
             if result == 0:

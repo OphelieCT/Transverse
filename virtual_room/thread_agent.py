@@ -20,10 +20,11 @@ class Process(threading.Thread, Artificial_Agent):
     results = []
 
     def __init__(self, own_map=None, initial_position=None, initial_direction=90, network=None,
-                 weights_file='mutative.h5', turns=100):
+                 weights_file='mutative.h5', turns=100, mutation_rate=30):
         threading.Thread.__init__(self)
-        Artificial_Agent.__init__(self, own_map, initial_position, initial_direction, network=network,
-                                  weights_file=weights_file)
+        Artificial_Agent.__init__(self, own_map=own_map, initial_position=initial_position,
+                                  initial_direction=initial_direction, network=network,
+                                  weights_file=weights_file, mutation_rate=mutation_rate)
         self.turns = turns
         Process.processes.append(self)
 
