@@ -18,6 +18,7 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
                  weights_file='mutative.h5'):
         Room_Agent.__init__(self, own_map, initial_position, initial_direction)
         Mutative_Agent.__init__(network, weights_file)
+        self.known = []
 
     def choose_direction(self):
         # self.scan_map(self.map, self.position[0], self.position[1], self.direction)
@@ -42,7 +43,11 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
             result = action[0](action[1][0], action[1][1])
             if result == 0:
                 case_value = self.map[self.position[0]][self.position[1]]
-                if case_value == self.UNKNOWN:
-                    self.score += 2
+                if case_value == self.UNKNOWN and self.position not in self.known:
+                    self.score += 5
+                    self.known.append(self.position)
                 elif case_value == self.OBSTACLE:
                     self.score -= 5
+                elif self.position not in self.known:
+                    self.score += case_value
+                    self.known.append(self.position)

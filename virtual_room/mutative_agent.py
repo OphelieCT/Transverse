@@ -29,6 +29,12 @@ class Mutative_Agent:
     def __lt__(self, other):
         return self.score < other.score
 
+    def save_me(self):
+        try:
+            self.net.save_weights(self.weights_file)
+        except OSError:
+            self.net.save_weights(self.weights_file[:-3] + '1' + '.h5')
+
     @staticmethod
     def build_net():
         """ Inputs are :

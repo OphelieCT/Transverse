@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 # ---- Imports ----
 import numpy as np
 
+# ---- Settings ----
+np.random.seed()
+
 
 # ---- Class ----
 class Room_Agent:
@@ -28,6 +31,10 @@ class Room_Agent:
             self.map = np.array([[0]])
         if self.position is None:
             self.position = (len(self.map) // 2, len(self.map) // 2)
+        elif self.position == 'random':
+            self.position = (np.random.randint(len(self.map)), np.random.randint(len(self.map[0])))
+        if self.direction == 'random':
+            self.direction = np.random.randint(360)
 
     def __str__(self):
         return "Agent with id {}".format(self.id)
