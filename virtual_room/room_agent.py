@@ -44,7 +44,7 @@ class Room_Agent:
 
     def resume_movements(self):
         plt.scatter(self.movement_history['x'], self.movement_history['y'])
-        return plt
+        plt.show()
 
     def move(self, next_x, next_y):
         if (0 <= next_x < len(self.map)) and (0 <= next_y < len(self.map[next_x])):
