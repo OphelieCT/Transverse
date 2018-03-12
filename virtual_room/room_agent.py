@@ -57,6 +57,7 @@ class Room_Agent:
     def rotate(self, to_direction):
         to_direction %= 360
         self.direction = to_direction
+        return 0
 
     def data_on_front(self):
         """ Returns a list with :

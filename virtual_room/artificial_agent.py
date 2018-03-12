@@ -36,20 +36,24 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
                             self.position[1] - int(np.round(np.sin(np.deg2rad(self.direction)))))]
         }
         predictions = self.choose_direction()
-        better = max(predictions)
-        better_index = predictions.index(better)
-        action = actions.get(better_index)
-        if better_index < 2:  # rotation
-            action[0](action[1])
-        else:  # move forward
-            result = action[0](action[1][0], action[1][1])
-            if result == 0:
-                case_value = self.map[self.position[0]][self.position[1]]
-                if case_value == self.UNKNOWN and self.position not in self.known:
-                    self.score += 5
-                    self.known.append(self.position)
-                elif case_value == self.OBSTACLE:
-                    self.score -= 5
-                elif self.position not in self.known:
-                    self.score += case_value
-                    self.known.append(self.position)
+        result = 1
+        while result != 0:
+            better = max(predictions)
+            better_index = predictions.index(better)
+            action = actions.get(better_index)
+            if better_index < 2:  # rotation
+                result = action[0](action[1])
+            else:  # move forward
+                result = action[0](action[1][0], action[1][1])
+                if result == 0:
+                    case_value = self.map[self.position[0]][self.position[1]]
+                    if case_value == self.UNKNOWN and self.position not in self.known:
+                        self.score += 5
+                        self.known.append(self.position)
+                    elif case_value == self.OBSTACLE:
+                        self.score -= 5
+                    elif self.position not in self.known:
+                        self.score += case_value
+                        self.known.append(self.position)
+            if result != 0:
+                predictions[better_index] = 0.  # remove decision
