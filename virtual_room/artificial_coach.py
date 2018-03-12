@@ -39,6 +39,7 @@ class Artificial_Coach:
         if turns is None:
             turns = self.turns
         for process in self.population:
+            process.score = 0
             process.turns = turns
             process.start()
         for process in Process.processes:
