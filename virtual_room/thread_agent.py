@@ -22,7 +22,8 @@ class Process(threading.Thread, Artificial_Agent):
     def __init__(self, own_map=None, initial_position=None, initial_direction=90, network=None,
                  weights_file='mutative.h5', turns=100):
         threading.Thread.__init__(self)
-        Artificial_Agent.__init__(self, own_map, initial_position, initial_direction, network, weights_file)
+        Artificial_Agent.__init__(self, own_map, initial_position, initial_direction, network=network,
+                                  weights_file=weights_file)
         self.turns = turns
         Process.processes.append(self)
 

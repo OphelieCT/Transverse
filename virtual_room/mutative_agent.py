@@ -97,14 +97,16 @@ class Mutative_Agent:
             print('[DEBUG] ERROR')
             exit(0)
         winner_index = int(len(population) * winner_percentage) + 1
-        winners = population[:winner_index]
+        winners: list = population[:winner_index]
         population = population[winner_index:]
         losers_size = int(len(population) * other_percentage)
         for i in range(losers_size):
             new_survivor_index = np.random.randint(0, len(population))
             winners.append(population[new_survivor_index])
             population.pop(new_survivor_index)
-        winners = (np.random.shuffle(np.array(winners))).tolist()
+        winners: np.ndarray = np.array(winners)
+        np.random.shuffle(winners)
+        winners: list = winners.tolist()
         new_population = []
         # mix_list = []
         for i in range(new_population_length):
@@ -115,8 +117,10 @@ class Mutative_Agent:
                 second = np.random.randint(0, len(winners))
             # mix_list.append((first, second))
             # mix_list.append((second, first))
-            mixing = [copy.copy(winners[first]), copy.copy(winners[second])]
-            new_population.append(Mutative_Agent.cross(mixing))
+            is_mixed = copy.copy(winners[first])
+            mixing = [is_mixed.net, winners[second].net]
+            Mutative_Agent.cross(mixing)
+            new_population.append(is_mixed)
         for net in new_population:
             net.try_to_mutate()
         return new_population

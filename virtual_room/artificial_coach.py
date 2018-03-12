@@ -44,6 +44,8 @@ class Artificial_Coach:
             process.start()
         for process in self.population:
             process.join()
+        print(self.population[0].net)
+        exit(0)
         self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3, other_percentage=0.1)
 
     def darwin(self, generations=None, turns_per_generation=None, verbose=1):
