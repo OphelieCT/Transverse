@@ -48,8 +48,15 @@ class Artificial_Coach:
         if turns_per_generation is None:
             turns_per_generation = self.turns
         for generation in range(generations):
+            temp_map = copy.deepcopy(self.map.grid)  # keep original map safe
             for process in self.population:
                 process.reset_movements()
+                process.map = temp_map
             if verbose > 0:
                 print('Generation {}/{}'.format(generation + 1, generations))
             self.training(turns=turns_per_generation)
+        self.population = sorted(self.population)
+        self.population[0].save_me()
+        if verbose > 1:
+            self.population[0].resume_movements()
+        return self.population[0]
