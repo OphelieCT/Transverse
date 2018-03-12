@@ -40,6 +40,7 @@ class Process(Artificial_Agent):
             Process.results.append(self.score)
 
     def start(self):
+        self.known = []
         temp = threading.Thread(target=Process.execute_thread, args=(self,))
         temp.start()
         Process.processes.append(temp)

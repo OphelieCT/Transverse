@@ -10,7 +10,7 @@ import virtual_room
 # ---- Settings ----
 generations = 100
 turns = 100
-population = 1
+population = 10
 weights = 'training.h5'
 map_shape = (100, 100)
 
@@ -28,7 +28,3 @@ if __name__ == '__main__':
         weights_file=weights
     )
     finalist = coach.darwin(verbose=2)
-    """room = virtual_room.Virtual_Room((map_shape))
-    t = virtual_room.Process(own_map=room.grid)
-    t.execute_actions()
-    print(t.net.predict(np.array([[0, 0, 1]])))"""

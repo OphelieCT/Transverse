@@ -21,7 +21,7 @@ class Virtual_Room:
         self.create_grid()
 
     def create_grid(self):
-        self.grid = np.random.randint(-2, 2, size=self.dimensions)
+        self.grid = np.random.randint(-2, 1, size=self.dimensions)
 
     def represent(self):
         for i in range(self.grid.shape[0]):

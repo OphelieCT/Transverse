@@ -30,8 +30,8 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
 
     def execute_actions(self):
         actions = {
-            0: [self.rotate, (self.direction + 270)],  # tourne à droite
-            1: [self.rotate, (self.direction + 90)],  # tourne à gauche
+            0: [self.rotate, (self.direction + 350)],  # tourne à droite
+            1: [self.rotate, (self.direction + 10)],  # tourne à gauche
             2: [self.move, (self.position[0] - int(np.round(np.cos(np.deg2rad(self.direction)))),  # avance tout droit
                             self.position[1] - int(np.round(np.sin(np.deg2rad(self.direction)))))]
         }
