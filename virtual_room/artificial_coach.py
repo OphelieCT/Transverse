@@ -61,8 +61,8 @@ class Artificial_Coach:
             if verbose > 0:
                 print('Generation {}/{}'.format(generation + 1, generations))
             self.training(turns=turns_per_generation)
-        self.population = sorted(self.population)
-        self.population[0].save_me()
+            self.population = sorted(self.population)
+            self.population[0].save_me()
         if verbose > 1:
             self.population[0].resume_movements()
         return self.population[0]
