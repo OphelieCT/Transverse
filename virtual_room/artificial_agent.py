@@ -25,7 +25,7 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
     def choose_direction(self):
         # self.scan_map(self.map, self.position[0], self.position[1], self.direction)
         datas = self.data_on_front()
-        predictions = self.net.predict(np.array([datas]))
+        predictions = self.net.predict(np.array([datas]))  # BUG
         return predictions[0].tolist()
 
     def execute_actions(self):

@@ -25,6 +25,7 @@ class Mutative_Agent:
         self.net = network
         if self.net is None:
             self.net = self.build_net()
+        self.net.predict(np.array([[0, 0, 0]]))
 
     def __lt__(self, other):
         return self.score < other.score
@@ -93,34 +94,34 @@ class Mutative_Agent:
         if new_population_length is None:
             new_population_length = len(population)
         population = sorted(population)
-        if population[0].score < population[-1].score:  # DEBUG
-            print('[DEBUG] ERROR')
-            exit(0)
-        winner_index = int(len(population) * winner_percentage) + 1
+        winner_index = int(len(population) * winner_percentage)
         winners: list = population[:winner_index]
-        population = population[winner_index:]
-        losers_size = int(len(population) * other_percentage)
-        for i in range(losers_size):
-            new_survivor_index = np.random.randint(0, len(population))
-            winners.append(population[new_survivor_index])
-            population.pop(new_survivor_index)
-        winners: np.ndarray = np.array(winners)
-        np.random.shuffle(winners)
-        winners: list = winners.tolist()
-        new_population = []
-        # mix_list = []
-        for i in range(new_population_length):
-            first = 0
-            second = 0
-            while first == second:  # and ((first, second) in mix_list or (second, first) in mix_list):
-                first = np.random.randint(0, len(winners))
-                second = np.random.randint(0, len(winners))
-            # mix_list.append((first, second))
-            # mix_list.append((second, first))
-            is_mixed = copy.copy(winners[first])
-            mixing = [is_mixed.net, winners[second].net]
-            Mutative_Agent.cross(mixing)
-            new_population.append(is_mixed)
+        if len(winners) > 1:
+            population = population[winner_index:]
+            losers_size = int(len(population) * other_percentage)
+            for i in range(losers_size):
+                new_survivor_index = np.random.randint(0, len(population))
+                winners.append(population[new_survivor_index])
+                population.pop(new_survivor_index)
+            winners: np.ndarray = np.array(winners)
+            np.random.shuffle(winners)
+            winners: list = winners.tolist()
+            new_population = []
+            # mix_list = []
+            for i in range(new_population_length):
+                first = 0
+                second = 0
+                while first == second:  # and ((first, second) in mix_list or (second, first) in mix_list):
+                    first = np.random.randint(0, len(winners))
+                    second = np.random.randint(0, len(winners))
+                # mix_list.append((first, second))
+                # mix_list.append((second, first))
+                is_mixed = copy.copy(winners[first])
+                mixing = [is_mixed.net, winners[second].net]
+                Mutative_Agent.cross(mixing)
+                new_population.append(is_mixed)
+        else:
+            new_population = population
         for net in new_population:
             net.try_to_mutate()
         return new_population
