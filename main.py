@@ -10,9 +10,9 @@ import virtual_room
 # ---- Settings ----
 generations = 100
 turns = 50
-population = 20
+population = 100
 weights = 'training.h5'
-map_shape = (1000, 1000)
+map_shape = (2000, 2000)
 
 # ---- Script ----
 if __name__ == '__main__':

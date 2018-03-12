@@ -7,7 +7,6 @@
 # ---- Imports ----
 import copy
 
-from virtual_room.mutative_agent import Mutative_Agent
 from virtual_room.room import Virtual_Room
 from virtual_room.thread_agent import Process
 
@@ -46,7 +45,7 @@ class Artificial_Coach:
             if process.is_alive():
                 process.join()
             Process.purge()
-        self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3, other_percentage=0.1)
+        # self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3, other_percentage=0.1)
 
     def darwin(self, generations=None, turns_per_generation=None, verbose=1):
         if generations is None:
