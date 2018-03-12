@@ -96,7 +96,7 @@ class Mutative_Agent:
         if population[0].score < population[-1].score:  # DEBUG
             print('[DEBUG] ERROR')
             exit(0)
-        winner_index = (int(len(population)) * winner_percentage) + 1
+        winner_index = int(len(population) * winner_percentage) + 1
         winners = population[:winner_index]
         population = population[winner_index:]
         losers_size = int(len(population) * other_percentage)
