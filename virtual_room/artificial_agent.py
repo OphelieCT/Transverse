@@ -22,6 +22,10 @@ class Artificial_Agent(Room_Agent, Mutative_Agent):
         Mutative_Agent.__init__(self, mutation_rate=mutation_rate, network=network, weights_file=weights_file)
         self.known = []
 
+    def reset_movements(self):
+        self.known = []
+        Room_Agent.reset_movements(self)
+
     def choose_direction(self):
         # self.scan_map(self.map, self.position[0], self.position[1], self.direction)
         datas = self.data_on_front()

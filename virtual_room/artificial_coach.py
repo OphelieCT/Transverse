@@ -34,6 +34,8 @@ class Artificial_Coach:
         if initial_position == 'random':
             initial_position = (
                 np.random.randint(map_shape[0]), np.random.randint(map_shape[1]))  # all agents on the same position
+        self.initial_direction = initial_direction
+        self.initial_position = initial_position
         for i in range(population_size):  # random population initialization
             self.population.append(Process(
                 own_map=temp_map,
@@ -47,7 +49,12 @@ class Artificial_Coach:
     def training(self, turns=None):
         if turns is None:
             turns = self.turns
+        temp_map = copy.deepcopy(self.map.grid)  # keep original map safe
         for process in self.population:
+            process.initial_position = self.initial_position
+            process.initial_direction = self.initial_direction
+            process.reset_movements()
+            process.map = temp_map
             process.score = 0
             process.turns = turns
             process.start()
@@ -63,10 +70,6 @@ class Artificial_Coach:
         if turns_per_generation is None:
             turns_per_generation = self.turns
         for generation in range(generations):
-            temp_map = copy.deepcopy(self.map.grid)  # keep original map safe
-            for process in self.population:
-                process.reset_movements()
-                process.map = temp_map
             if verbose > 0:
                 print('Generation {}/{}'.format(generation + 1, generations))
             self.training(turns=turns_per_generation)
