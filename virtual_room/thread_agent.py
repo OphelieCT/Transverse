@@ -9,9 +9,6 @@ import threading
 
 from virtual_room.artificial_agent import Artificial_Agent
 
-# ---- Settings ----
-lock = threading.RLock()
-
 
 # ---- Class ----
 class Process(Artificial_Agent):
@@ -26,18 +23,9 @@ class Process(Artificial_Agent):
                                   weights_file=weights_file, mutation_rate=mutation_rate)
         self.turns = turns
 
-    def __del__(self):
-        with lock:
-            try:
-                Process.processes.remove(self)
-            except ValueError:
-                pass
-
     def execute_thread(self):
         for i in range(self.turns):
             self.execute_actions()
-        with lock:
-            Process.results.append(self.score)
 
     def start(self):
         self.known = []

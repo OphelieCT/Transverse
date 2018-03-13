@@ -9,8 +9,8 @@ import virtual_room
 
 # ---- Settings ----
 generations = 100
-turns = 50
-population = 100
+turns = 300
+population = 10
 weights = 'training.h5'
 map_shape = (2000, 2000)
 
@@ -25,6 +25,7 @@ if __name__ == '__main__':
         initial_position='random',
         initial_direction='random',
         network=None,
-        weights_file=weights
+        weights_file=weights,
+        mutation_rate=20
     )
     finalist = coach.darwin(verbose=2)

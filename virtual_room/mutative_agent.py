@@ -106,7 +106,10 @@ class Mutative_Agent:
     def random_fusion(population, fusion_length, repetition=False):
         fusions_index = []
         fusions = []
-        population: np.ndarray = np.array(copy.deepcopy(population))
+        population_copy = []
+        for obj in population:
+            population_copy.append(copy.copy(obj))
+        population: np.ndarray = np.array(population_copy)  # save original population and get all attributes
         np.random.shuffle(population)  # mix population
         population: list = population.tolist()
         total = comb(len(population), 2)  # maximum combinations
@@ -134,7 +137,10 @@ class Mutative_Agent:
         if new_population_length is None:
             new_population_length = len(population)
         winners, winner_index = Mutative_Agent.get_winners(population, winner_percentage)
-        new_population = copy.deepcopy(winners)  # winners automatically survive to the next gen
+        winners_copy = []
+        for obj in winners:
+            winners_copy.append(copy.copy(obj))
+        new_population = winners_copy  # winners automatically survive to the next gen
         # add fusions into new population
         fusions = Mutative_Agent.random_fusion(winners, new_population_length - len(new_population), repetition=False)
         new_population += fusions

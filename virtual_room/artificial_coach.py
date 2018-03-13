@@ -7,6 +7,9 @@
 # ---- Imports ----
 import copy
 
+import numpy as np
+
+from virtual_room.mutative_agent import Mutative_Agent
 from virtual_room.room import Virtual_Room
 from virtual_room.thread_agent import Process
 
@@ -18,7 +21,7 @@ class Artificial_Coach:
     def __init__(self, map_shape=(100, 100), population_size=100, generations=100, turns_number=100, own_map=None,
                  initial_position='random',
                  initial_direction='random', network=None,
-                 weights_file='mutative.h5'):
+                 weights_file='mutative.h5', mutation_rate=30):
         self.map = own_map
         if self.map is None:
             self.map = Virtual_Room(map_shape)
@@ -26,13 +29,19 @@ class Artificial_Coach:
         self.turns = turns_number
         temp_map = copy.deepcopy(self.map.grid)  # keep original map safe
         self.population = []
+        if initial_direction == 'random':
+            initial_direction = np.random.randint(360)  # all agents on the same direction
+        if initial_position == 'random':
+            initial_position = (
+                np.random.randint(map_shape[0]), np.random.randint(map_shape[1]))  # all agents on the same position
         for i in range(population_size):  # random population initialization
             self.population.append(Process(
                 own_map=temp_map,
                 initial_position=initial_position,
                 initial_direction=initial_direction,
                 network=network,
-                weights_file=weights_file
+                weights_file=weights_file,
+                mutation_rate=mutation_rate
             ))
 
     def training(self, turns=None):
@@ -46,7 +55,7 @@ class Artificial_Coach:
             if process.is_alive():
                 process.join()
             Process.purge()
-        # self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3, other_percentage=0.1)
+        self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3)
 
     def darwin(self, generations=None, turns_per_generation=None, verbose=1):
         if generations is None:
