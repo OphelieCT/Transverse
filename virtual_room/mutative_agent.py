@@ -26,7 +26,6 @@ class Mutative_Agent:
         self.net = network
         if self.net is None:
             self.net = self.build_net()
-        self.net.predict(np.array([[0, 0, 0]]))
 
     def __lt__(self, other):
         return self.score > other.score
@@ -50,23 +49,24 @@ class Mutative_Agent:
          Go forward"""
         model = models.Sequential([
             layers.Dense(9, input_dim=3, activation='relu'),
-            layers.Dropout(0.1),
+            # layers.Dropout(0.1),
             layers.Dense(54, activation='relu'),
-            layers.Dropout(0.1),
+            # layers.Dropout(0.1),
             layers.Dense(3, activation='softmax')
         ])
         model.compile(optimizer='adadelta', loss='binary_crossentropy', metrics=['accuracy'])
+        model.predict(np.array([[0, 0, 0]]))  # activate model
         return model
 
     def try_to_mutate(self):
-        if np.random.randint(0, 101) <= self.mutation_rate:
+        if np.random.randint(0, 101) < self.mutation_rate:
             self.mutation()
 
     def mutation(self):
         """ Create second neural network and mix both with 5% variation """
-        variation = 5  # 5% variation
-        minimal = 100 - variation
-        maximal = 101 + variation
+        variation = 2.5  # 5% variation
+        minimal = int(100 - variation)
+        maximal = int(101 + variation)
         for l in self.net.layers:
             w = l.get_weights()
             for entry in w:
@@ -133,13 +133,28 @@ class Mutative_Agent:
         return fusions
 
     @staticmethod
+    def copy_net(net):
+        new_net = Mutative_Agent.build_net()
+        for i in range(len(net.layers)):
+            new_net.layers[i].set_weights(copy.deepcopy(net.layers[i].get_weights()))
+        new_net.compile(optimizer='adadelta', loss='binary_crossentropy', metrics=['accuracy'])
+        new_net.predict(np.array([[0, 0, 0]]))  # activate model
+        return new_net
+
+    @staticmethod
+    def copy_agent(agent):
+        new_agent = copy.copy(agent)
+        new_agent.net = Mutative_Agent.copy_net(agent.net)
+        return new_agent
+
+    @staticmethod
     def evolve_population(population, winner_percentage=0.3, new_population_length=None):
         if new_population_length is None:
             new_population_length = len(population)
         winners, winner_index = Mutative_Agent.get_winners(population, winner_percentage)
         winners_copy = []
         for obj in winners:
-            winners_copy.append(copy.copy(obj))
+            winners_copy.append(Mutative_Agent.copy_agent(obj))
         new_population = winners_copy  # winners automatically survive to the next gen
         # add fusions into new population
         fusions = Mutative_Agent.random_fusion(winners, new_population_length - len(new_population), repetition=False)

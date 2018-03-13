@@ -5,11 +5,9 @@
 """ Class wich trains artificial agents and let them evolve """
 
 # ---- Imports ----
-import copy
 
 import numpy as np
 
-from virtual_room.mutative_agent import Mutative_Agent
 from virtual_room.room import Virtual_Room
 from virtual_room.thread_agent import Process
 
@@ -27,7 +25,6 @@ class Artificial_Coach:
             self.map = Virtual_Room(map_shape)
         self.generations_number = generations
         self.turns = turns_number
-        temp_map = copy.deepcopy(self.map.grid)  # keep original map safe
         self.population = []
         if initial_direction == 'random':
             initial_direction = np.random.randint(360)  # all agents on the same direction
@@ -38,7 +35,7 @@ class Artificial_Coach:
         self.initial_position = initial_position
         for i in range(population_size):  # random population initialization
             self.population.append(Process(
-                own_map=temp_map,
+                own_map=self.map.grid,
                 initial_position=initial_position,
                 initial_direction=initial_direction,
                 network=network,
@@ -49,12 +46,10 @@ class Artificial_Coach:
     def training(self, turns=None):
         if turns is None:
             turns = self.turns
-        temp_map = copy.deepcopy(self.map.grid)  # keep original map safe
         for process in self.population:
             process.initial_position = self.initial_position
             process.initial_direction = self.initial_direction
             process.reset_movements()
-            process.map = temp_map
             process.score = 0
             process.turns = turns
             process.start()
@@ -62,9 +57,10 @@ class Artificial_Coach:
             if process.is_alive():
                 process.join()
             Process.purge()
-        self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3)
+        # self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3)
 
     def darwin(self, generations=None, turns_per_generation=None, verbose=1):
+        temp = self.population
         if generations is None:
             generations = self.generations_number
         if turns_per_generation is None:
@@ -75,6 +71,7 @@ class Artificial_Coach:
             self.training(turns=turns_per_generation)
             self.population = sorted(self.population)
             self.population[0].save_me()
+            print(temp[0])
             if verbose > 0:
                 print('Highest score : ', self.population[0].score)
                 print('Lowest score : ', self.population[-1].score, '\n')
