@@ -9,6 +9,7 @@ import copy
 # ---- Imports ----
 import numpy as np
 from keras import models, layers
+from scipy.special import comb
 
 # ---- Settings ----
 np.random.seed()
@@ -58,73 +59,95 @@ class Mutative_Agent:
         return model
 
     def try_to_mutate(self):
-        if np.random.randint(0, 101) < self.mutation_rate:
+        if np.random.randint(0, 101) <= self.mutation_rate:
             self.mutation()
 
     def mutation(self):
-        """ Create second neural network and mix both with 1/50 variation """
-        temp = []
-        for i in range(49):
-            temp.append(copy.copy(self.net))
-        temp.append(self.build_net())
-        self.net = self.cross(temp, fusion=True)
+        """ Create second neural network and mix both with 5% variation """
+        variation = 5  # 5% variation
+        minimal = 100 - variation
+        maximal = 101 + variation
+        for l in self.net.layers:
+            w = l.get_weights()
+            for entry in w:
+                for i in range(len(entry)):
+                    for j in range(len(entry[i])):
+                        entry[i][j] *= np.random.randint(minimal, maximal) / 100
+            l.set_weights(w)
 
     @staticmethod
-    def cross(networks, fusion=False):
+    def cross(networks):
         """ Mix each network in list with the first layer by layer """
         if type(networks) not in (tuple, list, np.ndarray):
             return None
         try:
-            temp_net = networks[0]
-            for i in range(1, len(networks)):
-                for j in range(len(temp_net.layers)):
-                    temp_weights = temp_net.layers[j].get_weights()
+            temp_net = copy.copy(networks[0])  # get first network as principal and result of fusion
+            for i in range(1, len(networks)):  # get each others networks
+                for j in range(len(temp_net.layers)):  # work on each layer
+                    temp_weights = temp_net.layers[j].get_weights()  # get weights of both net in fusion process
                     input_weights = networks[i].layers[j].get_weights()
-                    for _ in range(len(temp_weights)):
-                        if fusion:
-                            temp_weights[_] += input_weights[_]
-                            temp_weights[_] /= len(networks)
-                        else:
-                            if np.random.randint(0, 101) < 50:
-                                temp_weights[_] = input_weights[_]
-                    temp_net.layers[j].set_weights(temp_weights)
+                    for _ in range(len(temp_weights)):  # make fusion of layers
+                        temp_weights[_] += input_weights[_]
+                        temp_weights[_] /= len(networks)
+                    temp_net.layers[j].set_weights(temp_weights)  # set new layer weights
         except ValueError:
             return None
         return temp_net
 
     @staticmethod
-    def evolve_population(population, winner_percentage=0.3, other_percentage=0.3, new_population_length=None):
+    def get_winners(population, winner_percentage=0.3):
+        winner_percentage = min(1., winner_percentage)  # protection against more winners percentage than 100%
+        population = sorted(population)
+        winner_index = int(len(population) * winner_percentage) + 1  # to include 0 if 0 is index
+        winners = population[:winner_index]
+        return winners, winner_index
+
+    @staticmethod
+    def random_fusion(population, fusion_length, repetition=False):
+        fusions_index = []
+        fusions = []
+        population: np.ndarray = np.array(copy.deepcopy(population))
+        np.random.shuffle(population)  # mix population
+        population: list = population.tolist()
+        total = comb(len(population), 2)  # maximum combinations
+        while True:
+            if not len(fusions) < fusion_length:
+                break
+            if not repetition and len(fusions) > total:
+                break
+            first, second = 0, 0
+            while first == second and ((first, second) in fusions_index or (second, first) in fusions_index):
+                first = np.random.randint(len(population))
+                second = np.random.randint(len(population))
+            if not repetition:  # if repetitions aren't allowed
+                fusions_index.append((first, second))
+                fusions_index.append((second, first))
+            mixed = [population[first].net, population[second].net]  # get to mix networks
+            result_net = Mutative_Agent.cross(mixed)  # make fusion
+            fusions.append(
+                copy.copy(population[first]))  # add new agent to new population (copy to keep its attributes and class)
+            fusions[-1].net = result_net  # apply new net on new agent
+        return fusions
+
+    @staticmethod
+    def evolve_population(population, winner_percentage=0.3, new_population_length=None):
         if new_population_length is None:
             new_population_length = len(population)
-        population = sorted(population)
-        winner_index = int(len(population) * winner_percentage)
-        winners: list = population[:winner_index]
-        if len(winners) > 1:
-            population = population[winner_index:]
-            losers_size = int(len(population) * other_percentage)
-            for i in range(losers_size):
-                new_survivor_index = np.random.randint(0, len(population))
-                winners.append(population[new_survivor_index])
-                population.pop(new_survivor_index)
-            winners: np.ndarray = np.array(winners)
-            np.random.shuffle(winners)
-            winners: list = winners.tolist()
-            new_population = []
-            # mix_list = []
-            for i in range(new_population_length):
-                first = 0
-                second = 0
-                while first == second:  # and ((first, second) in mix_list or (second, first) in mix_list):
-                    first = np.random.randint(0, len(winners))
-                    second = np.random.randint(0, len(winners))
-                # mix_list.append((first, second))
-                # mix_list.append((second, first))
-                is_mixed = copy.copy(winners[first])
-                mixing = [is_mixed.net, winners[second].net]
-                Mutative_Agent.cross(mixing)
-                new_population.append(is_mixed)
-        else:
-            new_population = population
-        for net in new_population:
-            net.try_to_mutate()
+        winners, winner_index = Mutative_Agent.get_winners(population, winner_percentage)
+        new_population = copy.deepcopy(winners)  # winners automatically survive to the next gen
+        # add fusions into new population
+        fusions = Mutative_Agent.random_fusion(winners, new_population_length - len(new_population), repetition=False)
+        new_population += fusions
+        # make random mutations from winners and add them in new population
+        for ai in winners:
+            if len(new_population) < new_population_length:
+                ai.try_to_mutate()
+                new_population.append(ai)
+            else:
+                break
+        # if needed, add random fusions from old population to new population
+        if len(new_population) < new_population_length:
+            all_fusions = Mutative_Agent.random_fusion(population, new_population_length - len(new_population),
+                                                       repetition=True)
+            new_population += all_fusions
         return new_population
