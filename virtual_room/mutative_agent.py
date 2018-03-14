@@ -49,9 +49,9 @@ class Mutative_Agent:
          Go forward"""
         model = models.Sequential([
             layers.Dense(9, input_dim=3, activation='relu'),
-            # layers.Dropout(0.1),
+            layers.Dropout(0.1),
             layers.Dense(54, activation='relu'),
-            # layers.Dropout(0.1),
+            layers.Dropout(0.1),
             layers.Dense(3, activation='softmax')
         ])
         model.compile(optimizer='adadelta', loss='binary_crossentropy', metrics=['accuracy'])
