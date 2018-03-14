@@ -13,7 +13,6 @@ turns = 1000
 population = 5
 weights = 'training.h5'
 map_shape = (10, 10)
-mutation_rate = 0
 
 # ---- Script ----
 if __name__ == '__main__':
@@ -26,7 +25,6 @@ if __name__ == '__main__':
         initial_position='random',
         initial_direction='random',
         network=None,
-        weights_file=weights,
-        mutation_rate=mutation_rate
+        weights_file=weights
     )
     finalist = coach.darwin(verbose=2)
