@@ -50,28 +50,34 @@ class Artificial_Agent(Room_Agent, Evolutive_Agent):
         result = 1
         better_index = 0
         reward_bonus = 0
+        score_bonus = 0
         while result != 0:
             better = max(predictions)
             better_index = predictions.index(better)
             action = actions.get(better_index)
             if better_index < 2:  # rotation
                 result = action[0](action[1])
+                reward_bonus = 10.
             else:  # move forward
                 result = action[0](action[1][0], action[1][1])
                 if result == 0:
                     case_value = self.map[self.position[0]][self.position[1]]
-                    if case_value == self.UNKNOWN and self.position not in self.known:
-                        reward_bonus = 5
-                        self.known.append(self.position)
+                    if case_value == self.UNKNOWN:
+                        reward_bonus = 20
+                        if self.position not in self.known:
+                            score_bonus = 20
+                            self.known.append(self.position)
                     elif case_value == self.OBSTACLE:
-                        reward_bonus = -5
-                    elif self.position not in self.known:
-                        reward_bonus = case_value
-                        self.known.append(self.position)
+                        reward_bonus = score_bonus = -50
+                    else:
+                        reward_bonus = case_value + 1
+                        if self.position not in self.known:
+                            score_bonus = case_value + 1
+                            self.known.append(self.position)
             if result != 0:
                 predictions[better_index] = 0.  # remove decision
-        self.score += reward_bonus
-        predictions[better_index] = max(min(1., predictions[better_index] + (reward_bonus / 200)), 0.)
+        self.score += score_bonus
+        predictions[better_index] = max(min(1., predictions[better_index] + (reward_bonus / 100)), 0.)
         self.predictions_history.append(predictions)
 
     def learn_rewards(self):
@@ -79,4 +85,4 @@ class Artificial_Agent(Room_Agent, Evolutive_Agent):
             return
         targets_batch = np.array([self.rewards_history])
         states_batch = np.array([self.predictions_history])
-        self.net.fit(states_batch, targets_batch, batch_size=16, epochs=500, verbose=0)
+        self.net.fit(states_batch, targets_batch, batch_size=5, epochs=500, verbose=0)
