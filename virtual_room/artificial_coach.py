@@ -19,7 +19,7 @@ class Artificial_Coach:
     def __init__(self, map_shape=(100, 100), population_size=100, generations=100, turns_number=100, own_map=None,
                  initial_position='random',
                  initial_direction='random', network=None,
-                 weights_file='mutative.h5', mutation_rate=30):
+                 weights_file='coach.h5'):
         self.map = own_map
         if self.map is None:
             self.map = Virtual_Room(map_shape)
@@ -39,14 +39,14 @@ class Artificial_Coach:
                 initial_position=initial_position,
                 initial_direction=initial_direction,
                 network=network,
-                weights_file=weights_file,
-                mutation_rate=mutation_rate
+                weights_file=weights_file
             ))
 
     def training(self, turns=None):
         if turns is None:
             turns = self.turns
         for process in self.population:
+            process.learn_rewards()
             process.initial_position = self.initial_position
             process.initial_direction = self.initial_direction
             process.reset_movements()
@@ -57,7 +57,6 @@ class Artificial_Coach:
             if process.is_alive():
                 process.join()
             Process.purge()
-        # self.population = Mutative_Agent.evolve_population(self.population, winner_percentage=0.3)
 
     def darwin(self, generations=None, turns_per_generation=None, verbose=1):
         temp = self.population

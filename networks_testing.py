@@ -10,7 +10,7 @@ import virtual_room
 # ---- Settings ----
 generations = 100
 turns = 100
-population = 10
+population = 2
 weights = 'training.h5'
 map_shape = (5, 5)
 
