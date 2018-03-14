@@ -75,6 +75,8 @@ class Artificial_Agent(Room_Agent, Evolutive_Agent):
         self.predictions_history.append(predictions)
 
     def learn_rewards(self):
+        if len(self.rewards_history) < 1 or len(self.predictions_history) < 1:
+            return
         targets_batch = np.array([self.rewards_history])
         states_batch = np.array([self.predictions_history])
         self.net.fit(states_batch, targets_batch, batch_size=16, epochs=500, verbose=0)
