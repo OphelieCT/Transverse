@@ -19,8 +19,7 @@ class Process(Artificial_Agent):
     def __init__(self, own_map=None, initial_position=None, initial_direction=90, network=None,
                  weights_file='mutative.h5', turns=100, mutation_rate=30):
         Artificial_Agent.__init__(self, own_map=own_map, initial_position=initial_position,
-                                  initial_direction=initial_direction, network=network,
-                                  weights_file=weights_file, mutation_rate=mutation_rate)
+                                  initial_direction=initial_direction, network=network, weights_file=weights_file)
         self.turns = turns
 
     def execute_thread(self):

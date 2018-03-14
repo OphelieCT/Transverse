@@ -97,3 +97,9 @@ class Room_Agent:
         if 0 <= next_x < len(self.map) and 0 <= next_y < len(self.map[0]):
             return self.count_values(next_x, next_y, direction, value_to_count, totals)
         return totals
+
+    def convert_history(self):
+        temp = []
+        for i in range(len(self.movement_history['x'])):
+            temp.append((self.movement_history['x'][i], self.movement_history['y'][i]))
+        return temp
