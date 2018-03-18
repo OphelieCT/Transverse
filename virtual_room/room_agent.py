@@ -27,6 +27,7 @@ class Room_Agent:
         self.direction = initial_direction  # in degrees
         self.movement_history = {'x': [], 'y': []}
         self.map = own_map
+        self.tested = []
         if own_map is None:
             self.map = np.array([[0]])
         if self.position is None:
@@ -38,6 +39,9 @@ class Room_Agent:
 
     def __str__(self):
         return "Agent with id {}".format(self.id)
+
+    def reset_tests(self):
+        self.tested = []
 
     def reset_movements(self):
         self.movement_history = {'x': [], 'y': []}
@@ -67,33 +71,29 @@ class Room_Agent:
         to_count = [Room_Agent.OBSTACLE, Room_Agent.UNKNOWN]
         totals = [0, 0, 0]
         # on compte dans un angle de 20° (centre, +10° , -10°)
-        angle = 0
-        bisectrix = angle / 2
-        np.array(self.count_values(self.position[0], self.position[1], self.direction, to_count, totals))
-        np.array(self.count_values(self.position[0], self.position[1], (self.direction + bisectrix) % 360, to_count,
-                                   totals))
-        np.array(
-            self.count_values(self.position[0], self.position[1], (self.direction + 360 - bisectrix) % 360, to_count,
-                              totals))
-        for i in range(2):
-            totals[i] = min(totals[i], 1)
+        angle = 20
+        bisectrix = angle // 2
+        right = 360 - bisectrix  # right rotation
+        left = 360 + bisectrix  # left rotation
+        for angle in range(right, left + 1):
+            temp_direction = self.direction + angle
+            temp_direction %= 360
+            self.count_values(self.position[0], self.position[1], temp_direction, to_count, totals)
         return totals
 
     def count_values(self, pos_x, pos_y, direction, value_to_count, totals):
-        """ Direction in degree """
-        print('Total = ', totals)
+        """ Direction in degrees """
         next_x, next_y = self.next_coord(pos_x, pos_y, direction)
         if 0 <= next_x < len(self.map) and 0 <= next_y < len(self.map[0]):
-            print(next_x, ' - ', next_y)
-            if self.map[next_x][next_y] == value_to_count[0]:
-                totals[0] += 1
+            to_add = {
+                value_to_count[0]: 0,
+                value_to_count[1]: 1,
+            }
+            case_value = self.map[next_x][next_y]
+            if case_value in to_add.keys():
+                totals[to_add.get(case_value)] = 1
                 return totals
-            elif self.map[next_x][next_y] > 0:
-                totals[2] += 1
-                return totals
-            elif self.map[next_x][next_y] == value_to_count[1]:
-                totals[1] += 1
-            print('Recursive')
+            totals[2] = max(case_value, totals[2])
             return self.count_values(next_x, next_y, direction, value_to_count, totals)
 
     def convert_history(self):
@@ -103,14 +103,11 @@ class Room_Agent:
         return temp
 
     @staticmethod
-    def direction_low(direction):
-        """ Direction in degree """
+    def next_coord(pos_x, pos_y, direction, distance=1):
+        """ Direction in degrees """
         direction = np.deg2rad(direction)
-        
-    @staticmethod
-    def next_coord(pos_x, pos_y, direction):
-        """ Direction in degree """
-        direction = np.deg2rad(direction)
-        next_x = pos_x - int(np.round(np.sin(direction)))
-        next_y = pos_y + int(np.round(np.cos(direction)))
+        x_bonus = int(min(np.round(distance * np.sin(direction)), 1))
+        y_bonus = int(min(np.round(distance * np.cos(direction)), 1))
+        next_x = pos_x - x_bonus
+        next_y = pos_y + y_bonus
         return next_x, next_y

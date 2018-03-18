@@ -26,3 +26,7 @@ class Virtual_Room:
     def represent(self):
         for i in range(self.grid.shape[0]):
             print(self.grid[i])
+
+    def __repr__(self):
+        self.represent()
+        return ''
