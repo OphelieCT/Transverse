@@ -4,16 +4,15 @@
 # ---- Description ----
 """ Description """
 
-
-
 # ---- Imports ----
 import keras.backend as K
 from keras.applications import VGG16
-from keras.layers import Flatten, Dense, Dropout
+from keras.layers import Flatten, Dense
 from keras.models import Sequential, Model
 from keras.preprocessing.image import load_img, img_to_array
 import numpy as np
 import os
+
 
 # ---- Class ----
 class Vision_Agent:
@@ -38,9 +37,7 @@ class Vision_Agent:
 
         # prepare the top of the model
         self.net.add(Flatten(input_shape=base_model.output_shape[1:]))
-        self.net.add(Dense(256, activation='relu'))
-        self.net.add(Dropout(0.05))
-        self.net.add(Dense(32, activation='softmax'))
+        self.net.add(Dense(32, activation='sigmoid'))
 
         # concatenate both
         self.net = Model(name='tag_image_net', inputs=base_model.input, outputs=self.net(base_model.output))
