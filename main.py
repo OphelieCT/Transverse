@@ -14,7 +14,11 @@ path = 'C:\\Users\\MPuis\\PycharmProjects\\Transverse\\pictures'
 # ---- Script ----
 if __name__ == '__main__':
     net = Vision_Agent()
-    predictions = net.pred_from_pict(path=path)
-    predictions = np.around(predictions, decimals=4)
+    predictions: np.ndarray = net.pred_from_dir(path=path)
+    predictions = predictions * 10 ** 1
+    predictions = predictions.astype(int)
     for pred in predictions:
+        for second_pred in predictions:
+            if pred is not second_pred:
+                print(np.array_equal(pred, second_pred))
         print(pred, '\n')

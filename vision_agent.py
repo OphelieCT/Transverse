@@ -7,7 +7,7 @@
 # ---- Imports ----
 import keras.backend as K
 from keras.applications import VGG16
-from keras.layers import Flatten, Dense
+from keras.layers import Flatten, Dense, Dropout
 from keras.models import Sequential, Model
 from keras.preprocessing.image import load_img, img_to_array
 import numpy as np
@@ -35,9 +35,15 @@ class Vision_Agent:
                            weights='imagenet',
                            input_shape=self.shape)
 
+        # set VGG layers to be not trainable
+        for lay in base_model.layers:
+            lay.trainable = False
+
         # prepare the top of the model
         self.net.add(Flatten(input_shape=base_model.output_shape[1:]))
-        self.net.add(Dense(32, activation='sigmoid'))
+        self.net.add(Dense(256, activation='relu'))
+        self.net.add(Dropout(0.10))
+        self.net.add(Dense(8, activation='sigmoid'))
 
         # concatenate both
         self.net = Model(name='tag_image_net', inputs=base_model.input, outputs=self.net(base_model.output))
@@ -51,12 +57,21 @@ class Vision_Agent:
         # compile the net
         self.net.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-    def pred_from_pict(self, path):
-        """ Makes a prediction from """
+    def pred_from_dir(self, path):
+        """ Makes a prediction from directory path """
+        batch = self.prepare_batch(path=path)
+        batch = np.array(batch)
+        pred = self.net.predict(batch)
+        return pred
+
+    def prepare_batch(self, path):
+        """ Prepare batch for each directory in the path """
         batch = []
         if os.path.isdir(path):
             images = os.listdir(path)
             for img_path in images:
+                if os.path.isdir(os.path.join(path, img_path)):
+                    batch += self.prepare_batch(os.path.join(path, img_path))
                 try:
                     img = self.extract_picture(os.path.join(path, img_path))
                     batch.append(img)
@@ -67,9 +82,7 @@ class Vision_Agent:
                 batch.append(self.extract_picture(path=path))
             except (OSError, FileNotFoundError):
                 return None
-        batch = np.array(batch)
-        pred = self.net.predict(batch)
-        return pred
+        return batch
 
     def extract_picture(self, path):
         """ Extracts a picture at the path """
