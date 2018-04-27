@@ -18,6 +18,8 @@ from keras.preprocessing.image import load_img, img_to_array
 # ---- Class ----
 class Vision_Agent:
     """ Analyze pictures """
+    # ---- Settings ----
+    default_weights_path = 'weights.h5'
 
     def __init__(self, shape=(224, 224), depth=3):
         self.shape = shape + (depth,)
@@ -42,6 +44,12 @@ class Vision_Agent:
 
         # concatenate both
         self.net = Model(name='tag_image_net', inputs=base_model.input, outputs=self.net(base_model.output))
+
+        # try to load weights excepting file doesn't exist, so it's saved
+        try:
+            self.net.load_weights(self.default_weights_path)
+        except OSError:
+            self.net.save_weights(self.default_weights_path, overwrite=True)
 
         # compile the net
         self.net.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
