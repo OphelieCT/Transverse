@@ -4,16 +4,16 @@
 # ---- Description ----
 """ Description """
 
-import os
+
 
 # ---- Imports ----
 import keras.backend as K
-import numpy as np
 from keras.applications import VGG16
 from keras.layers import Flatten, Dense, Dropout
 from keras.models import Sequential, Model
 from keras.preprocessing.image import load_img, img_to_array
-
+import numpy as np
+import os
 
 # ---- Class ----
 class Vision_Agent:

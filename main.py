@@ -6,6 +6,7 @@
 
 # ---- Imports ----
 from vision_agent import Vision_Agent
+import numpy as np
 
 # ---- Settings ----
 path = 'C:\\Users\\MPuis\\PycharmProjects\\Transverse\\pictures'
