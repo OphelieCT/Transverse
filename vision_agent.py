@@ -4,10 +4,15 @@
 # ---- Description ----
 """ Description """
 
+import os
+
 # ---- Imports ----
 import keras.backend as K
-from keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout
-from keras.models import Sequential
+import numpy as np
+from keras.applications import VGG16
+from keras.layers import Flatten, Dense, Dropout
+from keras.models import Sequential, Model
+from keras.preprocessing.image import load_img, img_to_array
 
 
 # ---- Class ----
@@ -15,22 +20,59 @@ class Vision_Agent:
     """ Analyze pictures """
 
     def __init__(self, shape=(224, 224), depth=3):
-        self.shape = shape + depth
+        self.shape = shape + (depth,)
         if K.image_data_format() == 'channels_first':  # Theano shape
-            self.shape = depth + shape
-        self.net = None  # define net var
+            self.shape = (depth,) + shape
+        self.net = Sequential()  # define net var
         self.buildnet()
 
     def buildnet(self):
-        self.net = Sequential(name='tag_image_net')
-        self.net.add(Conv2D(32, (3, 3), input_shape=self.shape, activation='relu'))
-        self.net.add(Dropout(0.05))
-        self.net.add(MaxPool2D((2, 2)))
-        self.net.add(Conv2D(32, (3, 3), activation='relu'))
-        self.net.add(Dropout(0.05))
-        self.net.add(MaxPool2D((2, 2)))
-        self.net.add(Flatten())
+        """ Build the net model """
+        self.net = Sequential()
+        # prepare base model
+        base_model = VGG16(include_top=False,
+                           weights='imagenet',
+                           input_shape=self.shape)
+
+        # prepare the top of the model
+        self.net.add(Flatten(input_shape=base_model.output_shape[1:]))
         self.net.add(Dense(256, activation='relu'))
         self.net.add(Dropout(0.05))
         self.net.add(Dense(32, activation='softmax'))
-        self.net.compile(optimizer='adam', loss='binary_crosstentropy', metrics=['accuracy'])
+
+        # concatenate both
+        self.net = Model(name='tag_image_net', inputs=base_model.input, outputs=self.net(base_model.output))
+
+        # compile the net
+        self.net.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+    def pred_from_pict(self, path):
+        """ Makes a prediction from """
+        batch = []
+        if os.path.isdir(path):
+            images = os.listdir(path)
+            for img_path in images:
+                try:
+                    img = self.extract_picture(os.path.join(path, img_path))
+                    batch.append(img)
+                except (OSError, FileNotFoundError):
+                    continue
+        else:
+            try:
+                batch.append(self.extract_picture(path=path))
+            except (OSError, FileNotFoundError):
+                return None
+        batch = np.array(batch)
+        pred = self.net.predict(batch)
+        return pred
+
+    def extract_picture(self, path):
+        """ Extracts a picture at the path """
+        img = load_img(path)
+        if K.image_data_format() == 'channels_first':
+            img = img.resize(self.shape[1:])
+        else:
+            img = img.resize(self.shape[:2])
+        img = img_to_array(img)
+        img = img.reshape(self.shape)
+        return img
