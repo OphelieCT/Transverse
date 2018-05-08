@@ -5,12 +5,11 @@
 """ Main script of project """
 
 # ---- Imports ----
-from PIL import Image, ImageDraw
 import numpy as np
 
 
 # ---- Functions ----
-def add_point(map, point, coord):
+def add_point(mapped, point, coord):
     relative_x = int(np.round(np.sin(np.deg2rad(point[1])) * point[0]))
     relative_y = int(np.round(np.cos(np.deg2rad(point[1])) * point[0]))
 
@@ -20,42 +19,46 @@ def add_point(map, point, coord):
     point_x = new_x + relative_x
     point_y = new_y + relative_y
 
-    if point_x >= len(map):
-        for i in range(len(map), point_x + 1):
-            map.append([0] * len(map[0]))
+    if point_x >= len(mapped):
+        for i in range(len(mapped), point_x + 1):
+            mapped.append([0] * len(mapped[0]))
     elif point_x < 0:
         for i in range(point_x, 0):
-            map.insert(0, [0] * len(map[0]))
+            mapped.insert(0, [0] * len(mapped[0]))
         new_x += np.absolute(point_x)
 
     if point_y < 0:
         y = np.absolute(point_y)
-        for i in range(len(map)):
-            map[i] = [0] * y + map[i]
+        for i in range(len(mapped)):
+            mapped[i] = [0] * y + mapped[i]
         new_y += np.absolute(point_y)
-    elif point_y >= len(map[0]):
-        length = point_y - len(map[0])
-        for i in range(len(map)):
-            map[i] += [0] * (length + 1)
+    elif point_y >= len(mapped[0]):
+        length = point_y - len(mapped[0])
+        for i in range(len(mapped)):
+            mapped[i] += [0] * (length + 1)
 
     point_x = max(0, point_x)
     point_y = max(0, point_y)
-    map[point_x][point_y] = 1
+    put_point(mapped, point_x, point_y, 1)
     return new_x, new_y
+
+
+def put_point(mapped, x, y, code):
+    mapped[x][y] = code
 
 
 # ---- Script ----
 if __name__ == '__main__':
-    map = [[]]
+    mapped = [[]]
     coord = (0, 0)
-    datas = [[2 * np.sqrt(2), i] for i in range(45, 360, 90)]
-    datas += [[2, i] for i in range(0, 360, 90)]
+    datas = [[3 * np.sqrt(2), i] for i in range(45, 360, 90)]
+    datas += [[3, i] for i in range(0, 360, 90)]
     print("Datas : {}".format(datas))
     print("Begin :")
-    print(np.array(map))
+    print(np.array(mapped))
     for point in datas:
-        coord = add_point(map, point, coord)
-        print("Step : {} - {}".format(coord, point[1]))
-        print(np.array(map))
-    print("Final map")
-    print(np.array(map))
+        coord = add_point(mapped, point, coord)
+
+    mapped[coord[0]][coord[1]] = 5
+    print("Final mapped - {}".format(coord))
+    print(np.array(mapped))
