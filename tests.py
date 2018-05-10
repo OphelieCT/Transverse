@@ -11,8 +11,7 @@ from matplotlib import pyplot as plt
 
 # ---- Functions ----
 def add_point(mapped, point, coord):
-    relative_x = int(np.round(np.sin(np.deg2rad(point[1])) * point[0]))
-    relative_y = int(np.round(np.cos(np.deg2rad(point[1])) * point[0]))
+    relative_x, relative_y = calculate_relative(point[0], point[1])
 
     new_x = coord[0]
     new_y = coord[1]
@@ -48,6 +47,33 @@ def put_point(mapped, x, y, code):
     mapped[x][y] = code
 
 
+def calculate_relative(distance, angle):
+    relative_x = int(np.round(np.sin(np.deg2rad(angle)) * distance))
+    relative_y = int(np.round(np.cos(np.deg2rad(angle)) * distance))
+    return relative_x, relative_y
+
+
+def search_pattern(mapped, datas):
+    positions = []
+    for point in datas:
+        positions.append(calculate_relative(point[0], point[1]))
+    for i in range(len(mapped)):
+        for j in range(len(mapped[i])):
+            if mapped[i][j] not in (0, 5):
+                continue
+            valid = 0
+            for x, y in positions:
+                try:
+                    if mapped[i + x][j + y] == 0:
+                        break
+                    else:
+                        valid += 1
+                except IndexError:
+                    break
+            if valid == len(positions):
+                return i, j
+
+
 # ---- Script ----
 if __name__ == '__main__':
     mapped = [[]]
@@ -64,6 +90,8 @@ if __name__ == '__main__':
 
     mapped[coord[0]][coord[1]] = 5
     print("Final mapped - {}".format(coord))
-    print(np.array(mapped))
+    print(np.array(mapped).T)
     plt.imshow(np.array(mapped), interpolation='nearest')
     plt.show()
+    print(search_pattern(mapped, tests))
+    print(np.array(mapped).T)
