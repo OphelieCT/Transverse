@@ -6,6 +6,7 @@
 
 # ---- Imports ----
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 # ---- Functions ----
@@ -53,12 +54,16 @@ if __name__ == '__main__':
     coord = (0, 0)
     datas = [[3 * np.sqrt(2), i] for i in range(45, 360, 90)]
     datas += [[3, i] for i in range(0, 360, 90)]
-    print("Datas : {}".format(datas))
+    tests = [[7, 90], [3 * np.sqrt(2), 135], [3, 180], [3 * np.sqrt(2), 225], [5, 270],
+             [3 * np.sqrt(2), 315], [4, 0], [4 * np.sqrt(2), 45]]
+    print("Datas : {}".format(tests))
     print("Begin :")
     print(np.array(mapped))
-    for point in datas:
+    for point in tests:
         coord = add_point(mapped, point, coord)
 
     mapped[coord[0]][coord[1]] = 5
     print("Final mapped - {}".format(coord))
     print(np.array(mapped))
+    plt.imshow(np.array(mapped), interpolation='nearest')
+    plt.show()
