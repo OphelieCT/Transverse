@@ -6,6 +6,7 @@
 
 # ---- Imports ----
 import numpy as np
+import copy
 from matplotlib import pyplot as plt
 
 
@@ -74,24 +75,51 @@ def search_pattern(mapped, datas):
                 return i, j
 
 
+def search_position(mapped, datas):
+    direction = 0
+    print("Datas", datas)
+    datas = copy.deepcopy(datas)
+    pred = []
+    for i in range(0, 360):
+        tests = []
+        for index in range(len(datas)):
+            tests.append(copy.deepcopy(datas[index]))
+            tests[-1][1] += i
+            tests[-1][1] %= 360
+        coord = search_pattern(mapped, tests)
+        if coord is not None:
+            print("{} - Tests\n{}\n".format(i, tests))
+            pred.append((coord, i))
+    return pred
+
+
+def place_mesures(mapped, datas, position, direction):
+    batch = []
+    datas = copy.deepcopy(datas)
+    for info in datas:
+        batch.append(info)
+        batch[-1][1] = (batch[-1][1] + 360 - direction) % 360  # if robot add its direction to mesures
+    for point in batch:
+        position = add_point(mapped, point, position)
+    return position
+
+
 # ---- Script ----
 if __name__ == '__main__':
     mapped = [[]]
+    direction = 45
     coord = (0, 0)
-    datas = [[3 * np.sqrt(2), i] for i in range(45, 360, 90)]
-    datas += [[3, i] for i in range(0, 360, 90)]
     tests = [[7, 90], [3 * np.sqrt(2), 135], [3, 180], [3 * np.sqrt(2), 225], [5, 270],
              [3 * np.sqrt(2), 315], [4, 0], [4 * np.sqrt(2), 45]]
+    for index in range(len(tests)):
+        tests[index][1] += direction
+        tests[index][1] %= 360
     print("Datas : {}".format(tests))
-    print("Begin :")
-    print(np.array(mapped))
-    for point in tests:
-        coord = add_point(mapped, point, coord)
-
-    mapped[coord[0]][coord[1]] = 5
-    print("Final mapped - {}".format(coord))
-    print(np.array(mapped).T)
+    coord: (int, int) = place_mesures(mapped, tests, coord, direction)
+    x: int = coord[0]
+    y: int = coord[1]
+    mapped[x][y] = 5
+    print("Final mapped - {}\n".format(coord))
     plt.imshow(np.array(mapped), interpolation='nearest')
     plt.show()
-    print(search_pattern(mapped, tests))
-    print(np.array(mapped).T)
+    print(search_position(mapped, tests))
