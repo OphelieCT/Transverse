@@ -76,21 +76,30 @@ def search_pattern(mapped, datas):
 
 
 def search_position(mapped, datas):
-    direction = 0
-    print("Datas", datas)
     datas = copy.deepcopy(datas)
     pred = []
     for i in range(0, 360):
         tests = []
-        for index in range(len(datas)):
-            tests.append(copy.deepcopy(datas[index]))
-            tests[-1][1] += i
-            tests[-1][1] %= 360
+        for index in datas:
+            tests.append(copy.deepcopy(index))
+            tests[-1][1] = (tests[-1][1] + 360 - i) % 360
         coord = search_pattern(mapped, tests)
+        print("{0} - {1}".format(i, coord))
         if coord is not None:
-            print("{} - Tests\n{}\n".format(i, tests))
             pred.append((coord, i))
-    return pred
+    resdir = 0
+    coord = np.full(shape=2, fill_value=0)
+    for prediction in pred:
+        coord += np.array(prediction[0])
+        resdir += prediction[1]
+    try:
+        resdir /= len(pred)
+        coord = coord // len(pred)
+        coord = coord.tolist()
+    except ZeroDivisionError:
+        resdir = None
+        coord = None
+    return coord, resdir
 
 
 def place_mesures(mapped, datas, position, direction):
@@ -107,7 +116,7 @@ def place_mesures(mapped, datas, position, direction):
 # ---- Script ----
 if __name__ == '__main__':
     mapped = [[]]
-    direction = 45
+    direction = 50
     coord = (0, 0)
     tests = [[7, 90], [3 * np.sqrt(2), 135], [3, 180], [3 * np.sqrt(2), 225], [5, 270],
              [3 * np.sqrt(2), 315], [4, 0], [4 * np.sqrt(2), 45]]
@@ -119,7 +128,11 @@ if __name__ == '__main__':
     x: int = coord[0]
     y: int = coord[1]
     mapped[x][y] = 5
-    print("Final mapped - {}\n".format(coord))
+    print("Final mapped - {}".format(coord))
     plt.imshow(np.array(mapped), interpolation='nearest')
-    plt.show()
-    print(search_position(mapped, tests))
+    # plt.show()
+    for index in range(len(tests)):
+        tests[index][1] += 360 - direction + 0
+        tests[index][1] %= 360
+    print("Datas : {}".format(tests))
+    print(search_position(mapped, tests))  # 0 degrees here
