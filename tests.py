@@ -87,11 +87,30 @@ def search_position(mapped, datas):
         print("{0} - {1}".format(i, coord))
         if coord is not None:
             pred.append((coord, i))
+
+    zero = False
+    for result in pred:
+        if 0 in result:
+            zero = True
+            break
+    if zero:
+        pred = []
+        for i in range(-10, 10):
+            tests = []
+            for index in datas:
+                tests.append(copy.deepcopy(index))
+                tests[-1][1] = (tests[-1][1] + 360 - i) % 360
+            coord = search_pattern(mapped, tests)
+            print("{0} - {1}".format(i, coord))
+            if coord is not None:
+                pred.append((coord, i))
+
     resdir = 0
     coord = np.full(shape=2, fill_value=0)
     for prediction in pred:
         coord += np.array(prediction[0])
         resdir += prediction[1]
+
     try:
         resdir /= len(pred)
         coord = coord // len(pred)
@@ -99,6 +118,8 @@ def search_position(mapped, datas):
     except ZeroDivisionError:
         resdir = None
         coord = None
+    if resdir < 0:
+        resdir = (360 + resdir) % 360
     return coord, resdir
 
 
@@ -132,7 +153,7 @@ if __name__ == '__main__':
     plt.imshow(np.array(mapped), interpolation='nearest')
     # plt.show()
     for index in range(len(tests)):
-        tests[index][1] += 360 - direction + 0
+        tests[index][1] += 360 - direction + 180
         tests[index][1] %= 360
     print("Datas : {}".format(tests))
     print(search_position(mapped, tests))  # 0 degrees here
