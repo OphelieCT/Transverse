@@ -75,36 +75,26 @@ def search_pattern(mapped, datas):
                 return i, j
 
 
-def search_position(mapped, datas):
+def scan(rangemin, rangemax, datas, zero_test=True):
     datas = copy.deepcopy(datas)
     pred = []
-    for i in range(0, 360):
+    for i in range(rangemin, rangemax):
         tests = []
         for index in datas:
             tests.append(copy.deepcopy(index))
             tests[-1][1] = (tests[-1][1] + 360 - i) % 360
         coord = search_pattern(mapped, tests)
-        print("{0} - {1}".format(i, coord))
         if coord is not None:
             pred.append((coord, i))
+            if zero_test:
+                if i == 0:
+                    return scan(-20, 20, datas, zero_test=False)
+    return pred
 
-    zero = False
-    for result in pred:
-        if 0 in result:
-            zero = True
-            break
-    if zero:
-        pred = []
-        for i in range(-10, 10):
-            tests = []
-            for index in datas:
-                tests.append(copy.deepcopy(index))
-                tests[-1][1] = (tests[-1][1] + 360 - i) % 360
-            coord = search_pattern(mapped, tests)
-            print("{0} - {1}".format(i, coord))
-            if coord is not None:
-                pred.append((coord, i))
 
+def search_position(mapped, datas):
+    datas = copy.deepcopy(datas)
+    pred = scan(0, 360, datas, zero_test=True)
     resdir = 0
     coord = np.full(shape=2, fill_value=0)
     for prediction in pred:
@@ -153,7 +143,7 @@ if __name__ == '__main__':
     plt.imshow(np.array(mapped), interpolation='nearest')
     # plt.show()
     for index in range(len(tests)):
-        tests[index][1] += 360 - direction + 180
+        tests[index][1] += 360 - direction + 0
         tests[index][1] %= 360
     print("Datas : {}".format(tests))
     print(search_position(mapped, tests))  # 0 degrees here
