@@ -8,14 +8,23 @@
 import serial
 import sys
 import glob
+import io
 
 
 # ---- Class ----
 class Arduino_Manager:
     """ Manage communication with arduino board """
 
-    def __init__(self):
-        self.port = serial.Serial(port=self.serial_ports()[0], baudrate=9600)
+    def __init__(self, port=None):
+        if port is None:
+            port = self.serial_ports()[0]
+        self.port = serial.Serial(port=port, baudrate=9600, timeout=1)
+
+    def send_data(self, data: str):
+        self.port.write(data.encode())
+
+    def receive_data_line(self):
+        return self.port.readline(io.IOBase())
 
     @staticmethod
     def serial_ports():

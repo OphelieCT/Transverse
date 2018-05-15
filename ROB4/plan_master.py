@@ -35,14 +35,16 @@ class Plan_Master:
         plt.axis('off')
         plt.show()
 
-    def place_mesures(self, datas):
+    def place_measures(self, datas):
         batch = []
         datas = copy.deepcopy(datas)
         for info in datas:
             batch.append(info)
-            batch[-1][1] = (batch[-1][1] + 360 - self.direction) % 360  # if robot add its direction to mesures
+            batch[-1]['angle'] = (
+                    (batch[-1]['angle'] + 360 - self.direction) % 360  # if robot add its direction to mesures
+            )
         for point in batch:
-            self.position = self.add_point(point[0], point[1])
+            self.position = self.add_point(point['distance'], point['angle'])
 
     def put_point(self, x, y, code):
         self.plan[x][y] = code
@@ -82,7 +84,7 @@ class Plan_Master:
     def search_pattern(self, datas):
         positions = []
         for point in datas:
-            positions.append(self.calculate_relative(point[0], point[1]))
+            positions.append(self.calculate_relative(point.get('distance'), point.get('angle')))
         for i in range(len(self.plan)):
             for j in range(len(self.plan[i])):
                 if self.plan[i][j] not in (0, 5):
@@ -106,7 +108,7 @@ class Plan_Master:
             tests = []
             for index in datas:
                 tests.append(copy.deepcopy(index))
-                tests[-1][1] = (tests[-1][1] + 360 - i) % 360
+                tests[-1]['angle'] = (tests[-1]['angle'] + 360 - i) % 360
             coord = self.search_pattern(tests)
             if coord is not None:
                 pred.append((coord, i))
