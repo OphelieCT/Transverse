@@ -24,11 +24,14 @@ class Rob(
     def receive_measures(self):
         """ Get measures per lines from arduino board """
         measures = []
-        data = True
-        while data:
-            data = self.receive_data_line()
-            data = data.split(' ')
-            measures.append({'distance': data[0], 'angle': data[1]})
+        data = ""
+        while "EOF" not in data:
+            data = self.receive_data_line().decode()
+            if len(data) > 1 and "EOF" not in data:
+                data = data.split(' ')
+                temp = {'distance': float(data[0]), 'angle': float(data[1])}
+                if temp.get('distance') < 400:
+                    measures.append(temp)
         return measures
 
     def update_plan(self):

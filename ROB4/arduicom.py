@@ -8,7 +8,6 @@
 import serial
 import sys
 import glob
-import io
 
 
 # ---- Class ----
@@ -24,7 +23,7 @@ class Arduino_Manager:
         self.port.write(data.encode())
 
     def receive_data_line(self):
-        return self.port.readline(io.IOBase())
+        return self.port.readline()
 
     @staticmethod
     def serial_ports():
