@@ -4,8 +4,8 @@
 # ---- Description ----
 """ Arduino communication """
 
-
 # ---- Imports ----
+import serial
 
 
 # ---- Class ----
