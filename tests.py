@@ -145,7 +145,7 @@ if __name__ == '__main__':
     fig.set_cmap('hot')
     plt.axis('off')
     plt.show()
-    img.savefig('test.png')
+    img.savefig('test.png', bbox_inches='tight', pad_inches=0, transparent=True)
     for index in range(len(tests)):
         tests[index][1] += 360 - direction + 0
         tests[index][1] %= 360
