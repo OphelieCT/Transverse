@@ -7,7 +7,7 @@
 # ---- Imports ----
 import numpy as np
 import copy
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 
 # ---- Functions ----
@@ -140,8 +140,12 @@ if __name__ == '__main__':
     y: int = coord[1]
     mapped[x][y] = 5
     print("Final mapped - {}".format(coord))
-    plt.imshow(np.array(mapped), interpolation='nearest')
-    # plt.show()
+    img = plt.figure()
+    fig = plt.imshow(np.array(mapped), interpolation='nearest')
+    fig.set_cmap('hot')
+    plt.axis('off')
+    plt.show()
+    img.savefig('test.png')
     for index in range(len(tests)):
         tests[index][1] += 360 - direction + 0
         tests[index][1] %= 360
