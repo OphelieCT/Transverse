@@ -28,7 +28,7 @@ class Rob(
         while data:
             data = self.receive_data_line()
             data = data.split(' ')
-            measures.append({'distance': data[0], 'angle': data[1]})
+            measures.append({'distance': data[0] * 340 / 20000, 'angle': data[1]})
         return measures
 
     def update_plan(self):
