@@ -7,6 +7,7 @@
 # ---- Imports ----
 from ROB4.arduicom import Arduino_Manager
 from ROB4.plan_master import Plan_Master
+import copy
 
 
 # ---- Class ----
@@ -32,9 +33,29 @@ class Rob(
                 temp = {'distance': float(data[0]), 'angle': float(data[1])}
                 if temp.get('distance') < 400:
                     measures.append(temp)
+        measures = self.filter(measures)
         return measures
 
     def update_plan(self):
         """ Scale and update the map """
         datas = self.receive_measures()
         self.place_measures(datas=datas)
+
+    def filter(self, datas):
+        shift = 2
+        lossRange = 10  # centimeters
+        filtered = copy.deepcopy(datas[:shift])
+        for index in range(shift, len(datas) - shift):
+            medium = 0
+            for i in range(index - shift, index + shift + 1):
+                if i == index:
+                    continue
+                medium += datas[i].get('distance')
+            medium /= shift * 2
+            if not (medium - lossRange < datas[index].get('distance') < medium + lossRange):
+                newData = medium
+            else:
+                newData = copy.deepcopy(datas[index]['distance'])
+            filtered.append(newData)
+        filtered = copy.deepcopy(datas[-shift:])
+        return filtered
