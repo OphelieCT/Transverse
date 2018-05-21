@@ -20,7 +20,8 @@ class Plan_Master:
     def __init__(self, position=(0, 0), direction=0, shape=(1, 1)):
         self.plan: list = np.full(shape, Plan_Master.freeway).tolist()
         self.position = position
-        self.direction = direction
+        self.direction = (direction + 90) % 360
+        self.put_point(position[0], position[1], 0)
 
     def save_plan(self, filename):
         img = plt.figure()
@@ -102,6 +103,7 @@ class Plan_Master:
                     return i, j
 
     def scan(self, rangemin, rangemax, datas, zero_test=True):
+        """ Scan the map """
         datas = copy.deepcopy(datas)
         pred = []
         for i in range(rangemin, rangemax):

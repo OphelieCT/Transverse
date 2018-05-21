@@ -8,6 +8,7 @@
 from ROB4.arduicom import Arduino_Manager
 from ROB4.plan_master import Plan_Master
 import copy
+import numpy as np
 
 
 # ---- Class ----
@@ -30,9 +31,8 @@ class Rob(
             data = self.receive_data_line().decode()
             if len(data) > 1 and "EOF" not in data:
                 data = data.split(' ')
-                temp = {'distance': float(data[0]), 'angle': float(data[1])}
-                if temp.get('distance') < 400:
-                    measures.append(temp)
+                temp = {'distance': np.round(float(data[0]), 0), 'angle': int(float(data[1]))}
+                measures.append(temp)
         measures = self.filter(measures)
         return measures
 
@@ -41,21 +41,31 @@ class Rob(
         datas = self.receive_measures()
         self.place_measures(datas=datas)
 
+    def upgrade_plan(self, loop=1):
+        """ Loop to increase points  """
+        for i in range(loop):
+            self.send_permission(permission='measure')
+            self.update_plan()
+
     def filter(self, datas):
-        shift = 2
-        lossRange = 10  # centimeters
-        filtered = copy.deepcopy(datas[:shift])
-        for index in range(shift, len(datas) - shift):
+        shift = 10
+        datas = copy.deepcopy(datas)
+        datas = [dico for dico in datas if dico.get('distance', 0) != 0]
+        for index in range(len(datas)):
             medium = 0
-            for i in range(index - shift, index + shift + 1):
-                if i == index:
-                    continue
+            tshift = shift
+            if index - tshift < 0:
+                tshift = index
+            if len(datas) <= tshift + index:
+                tshift = len(datas) - index - 1
+            for i in range(index - tshift, index + tshift + 1):
                 medium += datas[i].get('distance')
-            medium /= shift * 2
-            if not (medium - lossRange < datas[index].get('distance') < medium + lossRange):
-                newData = medium
-            else:
-                newData = copy.deepcopy(datas[index]['distance'])
-            filtered.append(newData)
-        filtered = copy.deepcopy(datas[-shift:])
-        return filtered
+            medium /= tshift * 2 + 1
+            datas[index]['distance'] = medium
+        return datas
+
+    def send_permission(self, permission='launch'):
+        msg = False
+        while not msg:
+            self.send_data(permission)
+            msg = self.receive_data_line()
