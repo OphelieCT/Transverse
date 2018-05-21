@@ -66,7 +66,10 @@ class Rob(
         return datas
 
     def send_permission(self, permission='launch'):
-        msg = False
-        while not msg:
+        msg = self.receive_data_line()
+        while "permission_needed" not in msg.decode():
+            self.send_data(permission)
+            msg = self.receive_data_line()
+        while "permission_needed" in msg.decode():
             self.send_data(permission)
             msg = self.receive_data_line()
