@@ -17,6 +17,7 @@ class Rob(
     Plan_Master
 ):
     """ A class which define robot """
+    ending_msg = 'EOF'
 
     def __init__(self, name="", position=(0, 0), direction=0, shape=(1, 1), port=None):
         Arduino_Manager.__init__(self, port=port)
@@ -29,7 +30,7 @@ class Rob(
         data = ""
         while "EOF" not in data:
             data = self.receive_data_line().decode()
-            if len(data) > 1 and "EOF" not in data:
+            if len(data) > 1 and self.ending_msg not in data:
                 data = data.split(' ')
                 temp = {'distance': np.round(float(data[0]), 0), 'angle': int(float(data[1]))}
                 measures.append(temp)
