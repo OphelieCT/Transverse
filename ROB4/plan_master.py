@@ -135,16 +135,15 @@ class Plan_Master:
         for prediction in pred:
             coord += np.array(prediction[0])
             resdir += prediction[1]
-
         try:
             resdir /= len(pred)
             coord = coord // len(pred)
             coord = coord.tolist()
+            if resdir < 0:
+                resdir = (360 + resdir) % 360
         except ZeroDivisionError:
-            resdir = None
-            coord = None
-        if resdir < 0:
-            resdir = (360 + resdir) % 360
+            resdir = self.direction
+            coord = self.position
         return coord, resdir
 
     @staticmethod

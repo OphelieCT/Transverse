@@ -48,7 +48,7 @@ class Rob(
         """ Search the rob position """
         datas = self.receive_measures()
         datas = self.treat_mesures(datas=datas)
-        Plan_Master.search_position(self, datas=datas)
+        self.position, self.direction = Plan_Master.search_position(self, datas=datas)
 
     def filter(self, datas):
         shift = 10
@@ -76,7 +76,9 @@ class Rob(
             elif 'right' in msg:
                 self.direction += 90
                 self.direction %= 360
-            elif 'permission_needed' in msg:
+            elif 'position' in msg:
+                self.find_self()
+            elif 'plan' in msg:
                 self.update_plan()
             else:
                 time.sleep(1)
