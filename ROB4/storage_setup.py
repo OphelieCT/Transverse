@@ -20,7 +20,7 @@ def automount(mnt_point, FLAG='Transverse'):
         if devices != old_devices:
             old_devices = devices
             for dev in devices:
-                if 'sd' in dev:
+                if 'sd' in dev and dev[-1].isdigit():
                     p = subprocess.Popen("mount {0} {1}".format(dev, mnt_point), shell=True,
                                          stdout=subprocess.PIPE,
                                          stderr=subprocess.PIPE)
