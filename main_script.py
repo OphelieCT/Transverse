@@ -6,7 +6,6 @@
 
 # ---- Imports ----
 import ROB4
-import time
 import os
 
 # ---- Script ----
@@ -18,6 +17,5 @@ if __name__ == '__main__':
     plan_path = os.path.join(mnt_point, plan_name)
     ROB4.automount(mnt_point, FLAG='Transverse')
     while True:
-        rob.upgrade_plan(2)
+        rob.listen()
         rob.save_plan(plan_path)
-        time.sleep(scan_latence)

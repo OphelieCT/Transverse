@@ -9,6 +9,7 @@ from ROB4.arduicom import Arduino_Manager
 from ROB4.plan_master import Plan_Master
 import copy
 import numpy as np
+import time
 
 
 # ---- Class ----
@@ -42,11 +43,10 @@ class Rob(
         datas = self.receive_measures()
         self.place_measures(datas=datas)
 
-    def upgrade_plan(self, loop=1):
+    def upgrade_plan(self):
         """ Loop to increase points  """
-        for i in range(loop):
-            self.send_permission(permission='measure')
-            self.update_plan()
+        self.send_permission(permission='measure')
+        self.update_plan()
 
     def filter(self, datas):
         shift = 10
@@ -64,6 +64,22 @@ class Rob(
             medium /= tshift * 2 + 1
             datas[index]['distance'] = medium
         return datas
+
+    def listen(self):
+        while True:
+            msg = self.receive_data_line().decode()
+            if 'left' in msg:
+                self.direction += 360 - 90
+                self.direction %= 360
+            elif 'right' in msg:
+                self.direction += 90
+                self.direction %= 360
+            elif 'permission_needed' in msg:
+                self.upgrade_plan()
+            else:
+                time.sleep(1)
+                continue
+            break
 
     def send_permission(self, permission='launch'):
         msg = self.receive_data_line()
