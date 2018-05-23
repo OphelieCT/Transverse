@@ -11,7 +11,6 @@ import os
 # ---- Script ----
 if __name__ == '__main__':
     rob = ROB4.Rob(name='Jammy')
-    scan_latence = 10
     mnt_point = '/media/usb0/'
     plan_name = 'plan.png'
     plan_path = os.path.join(mnt_point, plan_name)

@@ -16,12 +16,12 @@ class Plan_Master:
     freeway = 0
     obstacle = 1
     unknown = -1
+    point_size = 4
 
     def __init__(self, position=(0, 0), direction=0, shape=(1, 1)):
         self.plan: list = np.full(shape, Plan_Master.freeway).tolist()
         self.position = position
         self.direction = (direction + 90) % 360
-        self.put_point(position[0], position[1], 0)
 
     def save_plan(self, filename):
         img = plt.figure()
@@ -36,7 +36,7 @@ class Plan_Master:
         plt.axis('off')
         plt.show()
 
-    def place_measures(self, datas):
+    def treat_mesures(self, datas):
         batch = []
         datas = copy.deepcopy(datas)
         for info in datas:
@@ -44,11 +44,19 @@ class Plan_Master:
             batch[-1]['angle'] = (
                     (batch[-1]['angle'] + 360 - self.direction) % 360  # if robot add its direction to mesures
             )
+        return batch
+
+    def place_measures(self, datas):
+        batch = self.treat_mesures(datas=datas)
         for point in batch:
             self.position = self.add_point(point['distance'], point['angle'])
 
     def put_point(self, x, y, code):
-        self.plan[x][y] = code
+        """ Put a shift * shift square on map with x - y center """
+        shift = self.point_size
+        for i in range(x - shift, x + shift + 1):
+            for j in range(y - shift, y + shift + 1):
+                self.plan[i][j] = code
 
     def add_point(self, distance, angle):
         relative_x, relative_y = self.calculate_relative(distance, angle)
@@ -59,21 +67,21 @@ class Plan_Master:
         point_x = new_x + relative_x
         point_y = new_y + relative_y
 
-        if point_x >= len(self.plan):
-            for i in range(len(self.plan), point_x + 1):
+        if point_x + self.point_size >= len(self.plan):
+            for i in range(len(self.plan), point_x + self.point_size + 1):
                 self.plan.append([0] * len(self.plan[0]))
-        elif point_x < 0:
-            for i in range(point_x, 0):
+        if point_x - self.point_size < 0:
+            for i in range(point_x - self.point_size, 0):
                 self.plan.insert(0, [0] * len(self.plan[0]))
-            new_x += np.absolute(point_x)
+            new_x += np.absolute(point_x - self.point_size // 2)
 
-        if point_y < 0:
-            y = np.absolute(point_y)
+        if point_y - self.point_size < 0:
+            y = np.absolute(point_y - self.point_size)
             for i in range(len(self.plan)):
                 self.plan[i] = [0] * y + self.plan[i]
-            new_y += np.absolute(point_y)
-        elif point_y >= len(self.plan[0]):
-            length = point_y - len(self.plan[0])
+            new_y += np.absolute(point_y - self.point_size // 2)
+        if point_y + self.point_size >= len(self.plan[0]):
+            length = point_y + self.point_size - len(self.plan[0])
             for i in range(len(self.plan)):
                 self.plan[i] += [0] * (length + 1)
 

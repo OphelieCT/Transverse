@@ -29,6 +29,7 @@ class Rob(
         """ Get measures per lines from arduino board """
         measures = []
         data = ""
+        self.send_permission(permission='measure')
         while "EOF" not in data:
             data = self.receive_data_line().decode()
             if len(data) > 1 and self.ending_msg not in data:
@@ -43,10 +44,11 @@ class Rob(
         datas = self.receive_measures()
         self.place_measures(datas=datas)
 
-    def upgrade_plan(self):
-        """ Loop to increase points  """
-        self.send_permission(permission='measure')
-        self.update_plan()
+    def find_self(self):
+        """ Search the rob position """
+        datas = self.receive_measures()
+        datas = self.treat_mesures(datas=datas)
+        Plan_Master.search_position(self, datas=datas)
 
     def filter(self, datas):
         shift = 10
@@ -75,7 +77,7 @@ class Rob(
                 self.direction += 90
                 self.direction %= 360
             elif 'permission_needed' in msg:
-                self.upgrade_plan()
+                self.update_plan()
             else:
                 time.sleep(1)
                 continue
