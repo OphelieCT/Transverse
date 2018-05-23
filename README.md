@@ -2,6 +2,6 @@
 A school rep for transversal project on S4 2018
 
 The project is divided in two parts : Electronics and Informatic
-Here is the Informatic part wich treat informations, images and take decisions
+Here is the Computer part which treat informations and take decisions
 
-The Robot scans environment every 10 seconds
+The Robot scans environment each time it meets an obstacle
