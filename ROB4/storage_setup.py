@@ -15,11 +15,13 @@ import time
 def automount(mnt_point, FLAG='Transverse'):
     path = '/dev/sd*'
     old_devices = glob.glob(path)
+    print("Waiting to mount device...")
     while True:
         devices = glob.glob(path)
         if devices != old_devices:
             old_devices = devices
             for dev in devices:
+                print("Trying to mount {} on {}".format(dev, mnt_point))
                 if 'sd' in dev and dev[-1].isdigit():
                     p = subprocess.Popen("mount {0} {1}".format(dev, mnt_point), shell=True,
                                          stdout=subprocess.PIPE,
