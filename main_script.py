@@ -13,9 +13,8 @@ if __name__ == '__main__':
     mnt_point = '/media/usb0/'
     plan_name = 'plan.png'
     plan_path = os.path.join(mnt_point, plan_name)
-    # ROB4.automount(mnt_point, FLAG='Transverse')
+    ROB4.automount(mnt_point, FLAG='Transverse')
     rob = ROB4.Rob(name='Jammy')
-    for i in range(5):
+    while True:
         rob.listen()
-    rob.show_plan()
-    # rob.save_plan(plan_path)
+        rob.save_plan(plan_path)
