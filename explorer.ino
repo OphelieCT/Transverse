@@ -159,6 +159,7 @@ void move_decision() {
     multiple_scans(3);
     find_self();
   }
+  _mForward();
 }
 
 void _mStop()
