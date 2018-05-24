@@ -14,7 +14,7 @@ import time
 # ---- Functions ----
 def automount(mnt_point, FLAG='Transverse'):
     path = '/dev/sd*'
-    old_devices = glob.glob(path)
+    old_devices = []
     print("Waiting to mount device...")
     while True:
         devices = glob.glob(path)
