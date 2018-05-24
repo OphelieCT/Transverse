@@ -7,7 +7,7 @@
 # ---- Imports ----
 import copy
 import numpy as np
-import matplotlib.pyplot as plt
+from PIL import Image
 
 
 # ---- Class ----
@@ -16,7 +16,7 @@ class Plan_Master:
     freeway = 0
     obstacle = 1
     unknown = -1
-    point_size = 4
+    point_size = 3
 
     def __init__(self, position=(0, 0), direction=0, shape=(1, 1)):
         self.plan = np.full(shape, Plan_Master.freeway).tolist()
@@ -24,17 +24,14 @@ class Plan_Master:
         self.direction = (direction + 90) % 360
 
     def save_plan(self, filename):
-        img = plt.figure()
-        fig = plt.imshow(np.array(self.plan), interpolation='nearest')
-        fig.set_cmap('hot')
-        plt.axis('off')
-        img.savefig(filename, bbox_inches='tight', pad_inches=0, transparent=True)
+        arr = (np.array(self.plan) * 255).astype(np.uint8)
+        img = Image.fromarray(arr, mode='L')
+        img.save(filename)
 
     def show_plan(self):
-        fig = plt.imshow(np.array(self.plan), interpolation='nearest')
-        fig.set_cmap('hot')
-        plt.axis('off')
-        plt.show()
+        arr = (np.array(self.plan) * 255).astype(np.uint8)
+        img = Image.fromarray(arr, mode='L')
+        img.show()
 
     def treat_mesures(self, datas):
         batch = []
