@@ -20,7 +20,8 @@ class Rob(
     """ A class which define robot """
     ending_msg = 'EOF'
 
-    def __init__(self, name="", position=(0, 0), direction=0, shape=(1, 1), port=None):
+    def __init__(self, name="", position=(0, 0), direction=0,
+                 shape=(Plan_Master.point_size * 2, Plan_Master.point_size * 2), port=None):
         Arduino_Manager.__init__(self, port=port)
         Plan_Master.__init__(self, position=position, direction=direction, shape=shape)
         self.name = name
@@ -28,16 +29,16 @@ class Rob(
     def receive_measures(self):
         """ Get measures per lines from arduino board """
         measures = []
-        data = ""
+        data = self.receive_data_line().decode()
         self.send_permission(permission='measure', waitfor='measure')
         while "EOF" not in data:
             data = self.receive_data_line().decode()
-            print("Datas :", data)
-            if data.isnumeric():
-                if len(data) > 1 and self.ending_msg not in data:
-                    data = data.split(' ')
-                    temp = {'distance': np.round(float(data[0]), 0), 'angle': int(float(data[1]))}
-                    measures.append(temp)
+            if len(data) > 1 and self.ending_msg not in data:
+                data = data.split(' ')
+                if len(data) == 1:
+                    continue
+                temp = {'distance': np.round(float(data[0]), 0), 'angle': int(float(data[1]))}
+                measures.append(temp)
         measures = self.filter(measures)
         return measures
 
@@ -72,7 +73,6 @@ class Rob(
     def listen(self):
         while True:
             msg = self.receive_data_line().decode()
-            print(msg)
             if 'left' in msg:
                 self.send_permission(waitfor='left')
                 self.direction += 360 - 90
@@ -99,4 +99,5 @@ class Rob(
             self.send_data(permission)
             msg = self.receive_data_line()
         while 'received' in msg.decode():
+            self.send_data(permission)
             msg = self.receive_data_line()

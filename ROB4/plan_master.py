@@ -16,9 +16,9 @@ class Plan_Master:
     freeway = 0
     obstacle = 1
     unknown = -1
-    point_size = 3
+    point_size = 4
 
-    def __init__(self, position=(0, 0), direction=0, shape=(1, 1)):
+    def __init__(self, position=(0, 0), direction=0, shape=(point_size * 2, point_size * 2)):
         self.plan = np.full(shape, Plan_Master.freeway).tolist()
         self.position = position
         self.direction = (direction + 90) % 360

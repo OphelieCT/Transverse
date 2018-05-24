@@ -15,6 +15,8 @@ if __name__ == '__main__':
     plan_path = os.path.join(mnt_point, plan_name)
     # ROB4.automount(mnt_point, FLAG='Transverse')
     rob = ROB4.Rob(name='Jammy')
-    while True:
-        rob.listen()
-        rob.save_plan(plan_path)
+    # while True:
+    rob.listen()
+    # rob.update_plan()
+    rob.show_plan()
+    # rob.save_plan(plan_path)
