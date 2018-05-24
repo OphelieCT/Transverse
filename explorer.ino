@@ -12,7 +12,8 @@ const int pinServo = 3,
           ENB = 11,
           ABS = 120,
           ABT = 137,
-          distance_changement = 30;
+          distance_changement = 30,
+          del = 350;
 const String end_signal = "EOF";
 const unsigned long MEASURE_TIMEOUT = 25000UL; // 25ms = ~8m à 340m/s
 const float SOUND_SPEED = 343.0 / 20000; // cm
@@ -154,7 +155,8 @@ void move_decision() {
     else if ((rightDistance <= distance_changement) or (leftDistance <= distance_changement)) {
       _mBack();
     }
-
+    delay(del);
+    _mStop();
     // RESCAN FOR TESTS
     multiple_scans(3);
     find_self();
