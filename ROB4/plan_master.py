@@ -19,7 +19,7 @@ class Plan_Master:
     point_size = 4
 
     def __init__(self, position=(0, 0), direction=0, shape=(1, 1)):
-        self.plan: list = np.full(shape, Plan_Master.freeway).tolist()
+        self.plan = np.full(shape, Plan_Master.freeway).tolist()
         self.position = position
         self.direction = (direction + 90) % 360
 
