@@ -33,10 +33,11 @@ class Rob(
         while "EOF" not in data:
             data = self.receive_data_line().decode()
             print("Datas :", data)
-            if len(data) > 1 and self.ending_msg not in data:
-                data = data.split(' ')
-                temp = {'distance': np.round(float(data[0]), 0), 'angle': int(float(data[1]))}
-                measures.append(temp)
+            if data.isnumeric():
+                if len(data) > 1 and self.ending_msg not in data:
+                    data = data.split(' ')
+                    temp = {'distance': np.round(float(data[0]), 0), 'angle': int(float(data[1]))}
+                    measures.append(temp)
         measures = self.filter(measures)
         return measures
 
@@ -93,9 +94,9 @@ class Rob(
 
     def send_permission(self, permission='launch', waitfor='permission_needed'):
         msg = self.receive_data_line()
-        while waitfor not in msg.decode():
+        while waitfor in msg.decode() or 'received' not in msg.decode():
+            print("Perm :", msg)
             self.send_data(permission)
             msg = self.receive_data_line()
-        while "received" not in msg.decode():
-            self.send_data(permission)
+        while 'received' in msg.decode():
             msg = self.receive_data_line()

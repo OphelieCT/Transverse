@@ -45,20 +45,21 @@ void loop() {
 }
 
 /// ========= DATAS TREATMENT (RASPI) =========
-void multiple_scans(int loops) {
+void multiple_scans(int loops, String order) {
   for (int i = 0; i < loops; i++) {
-    Serial.println("plan");
-    scan_environment(0, 180);
+    need_permission(order);
+    scan_environment(0, 180, "measure");
+    delay(100);
   }
 }
 
 void find_self() {
-  Serial.println("position");
-  scan_environment(60, 120);
+  need_permission("position");
+  scan_environment(30, 160, "measure");
 }
 
-void scan_environment(int rangeB, int rangeE) {
-  if (need_permission() == "measure")
+void scan_environment(int rangeB, int rangeE, String perm) {
+  if (need_permission(perm) == "measure")
   {
     for (int i = rangeB; i < rangeE; i++) {
       head.write(i);
@@ -70,11 +71,10 @@ void scan_environment(int rangeB, int rangeE) {
   }
 }
 
-String need_permission() {
+String need_permission(String perm) {
   String msg = "";
-  char temp = ' ';
   while (!Serial.available()) {
-    Serial.println("permission_needed");
+    Serial.println(perm);
     delay(10);
   }
   Serial.println("received");
@@ -141,9 +141,10 @@ void move_decision() {
     head.write(135);
     leftDistance += get_measure();
     leftDistance /= 2;
-
+    head.write(90);
     // Send measures to raspi
-    multiple_scans(3);
+    find_self();
+    multiple_scans(3, "plan");
 
     // MOVE
     if (rightDistance > leftDistance) {
@@ -158,7 +159,7 @@ void move_decision() {
     delay(del);
     _mStop();
     // RESCAN FOR TESTS
-    multiple_scans(3);
+    multiple_scans(3, "plan");
     find_self();
   }
   _mForward();
@@ -198,7 +199,7 @@ void _mleft()
   digitalWrite(in2, LOW);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
-  Serial.println("left");
+  need_permission("left");
 }
 
 void _mright()
@@ -209,5 +210,5 @@ void _mright()
   digitalWrite(in2, HIGH);
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
-  Serial.println("right");
+  need_permission("right");
 }
