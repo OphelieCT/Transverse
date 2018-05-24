@@ -95,7 +95,6 @@ class Rob(
     def send_permission(self, permission='launch', waitfor='permission_needed'):
         msg = self.receive_data_line()
         while waitfor in msg.decode() or 'received' not in msg.decode():
-            print("Perm :", msg)
             self.send_data(permission)
             msg = self.receive_data_line()
         while 'received' in msg.decode():
