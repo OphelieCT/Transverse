@@ -10,10 +10,10 @@ const int pinServo = 3,
           in4 = 9,
           ENA = 5,
           ENB = 11,
-          ABS = 120,
-          ABT = 137,
+          ABS = 170,
+          ABT = 171,
           distance_changement = 30,
-          del = 350;
+          del = 500;
 const String end_signal = "EOF";
 const unsigned long MEASURE_TIMEOUT = 25000UL; // 25ms = ~8m à 340m/s
 const float SOUND_SPEED = 343.0 / 20000; // cm
@@ -42,6 +42,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   head.write(default_head);
   move_decision();
+  delay(500);
 }
 
 /// ========= DATAS TREATMENT (RASPI) =========
@@ -75,10 +76,10 @@ String need_permission(String perm) {
   String msg = "";
   while (!Serial.available()) {
     Serial.println(perm);
-    delay(10);
+    delay(500);
   }
-  Serial.println("received");
   msg = receive();
+  Serial.println("received");
   return msg;
 }
 
@@ -87,11 +88,11 @@ String receive() {
   char temp = ' ';
   while (Serial.available()) {
     temp = Serial.read();
-    if (temp != '\n' or temp != '\r' or temp != ' ') {
+    if ((97 <= temp and temp <= 122) or ( 65 <= temp and temp <= 90)) {
       msg += temp;
     }
-    return msg;
   }
+  return msg;
 }
 
 float get_measure() {
